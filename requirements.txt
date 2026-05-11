@@ -1,0 +1,23 @@
+# ============================================================
+# requirements.txt - Bloque 2 NLP: EDA y Preprocesamiento
+# Proyecto: Segmentación de células e interpretación de texto
+# Python 3.10.x | TensorFlow 2.20.0
+# ============================================================
+
+# --- Datos y análisis ---
+pandas
+numpy
+
+# --- Visualización ---
+matplotlib
+seaborn
+wordcloud
+
+# --- NLP ---
+nltk
+
+# --- Machine Learning / Deep Learning ---
+scikit-learn
+
+# --- Serialización (stdlib, no requiere instalación) ---
+# pickle → incluido en Python estándar
