@@ -1,0 +1,1706 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Preprocesamiento para Modelado &#8212; Deep Learning: Segmentación de Células e Interpretación de Texto</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/vision/02_preprocesamiento_sartorius';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Modelado — Sartorius Cell Instance Segmentation-Cellpose" href="03_modelado_sartorius_cellpose.html" />
+    <link rel="prev" title="Analisis Exploratorio de datos" href="01_EDA.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Deep Learning: Segmentación de Células e Interpretación de Texto
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 1 — Segmentación de Imágenes</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_EDA.html">Analisis Exploratorio de datos</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Preprocesamiento para Modelado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_modelado_sartorius_cellpose.html">Modelado — Sartorius Cell Instance Segmentation-Cellpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_modelado_sartorius_OPTIMIZADO.html">04 — Modelado Sartorius · OPTIMIZADO para Colab Pro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_hover-net.html">Modelado — HoVer-Net</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_mask_rcnn.html">Modelado — Mask R-CNN con Swin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_evaluacion_final.html">Evaluación Final — Sartorius Cell Instance Segmentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 2 — NLP</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../nlp/01_EDA_NLP_Resume.html">Bloque 2 - NLP: EDA y Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/02_Model_TFIDF_XGBoost.html">02 — Modelo Baseline: TF-IDF + XGBoost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/03_Model_CNN1D.html">03 — CNN-1D para Clasificación de Texto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/04_Model_BiLSTM.html">04 — Word2Vec + BiLSTM con Keras Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/05_Model_FastText.html">05 — Modelo FastText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/06_Model_DistilBERT.html">06 — DistilBERT Fine-tuning para Clasificación de Currículos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/07_Comparacion_Modelos.html">07 — Comparación de Modelos y Análisis Crítico</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/vision/02_preprocesamiento_sartorius.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Preprocesamiento para Modelado</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sartorius-cell-instance-segmentation">Sartorius Cell Instance Segmentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#librerias">1. Librerías</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion">2. Configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-datos">3. Carga de datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#funciones-auxiliares">4. Funciones auxiliares</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construccion-del-dataframe-por-imagen">5. Construcción del DataFrame por imagen</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-1-normalizacion">6. Paso 1 — Normalización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-2-redimensionamiento">7. Paso 2 — Redimensionamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-3-conversion-de-mascaras-rle-binaria-tensor">8. Paso 3 — Conversión de máscaras: RLE → Binaria → Tensor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-4-data-augmentation">9. Paso 4 — Data Augmentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-de-preprocesamiento-completo">10. Pipeline de preprocesamiento completo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#split-train-validacion-estratificado-por-cell-type">11. Split Train / Validación estratificado por cell_type</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clase-dataset-pytorch">12. Clase Dataset PyTorch</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entregable-comparacion-visual-original-vs-procesada">13. Entregable — Comparación visual: Original vs Procesada</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exportacion">14. Exportacion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resumen-del-pipeline">15. Resumen del pipeline</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="preprocesamiento-para-modelado">
+<h1>Preprocesamiento para Modelado<a class="headerlink" href="#preprocesamiento-para-modelado" title="Link to this heading">#</a></h1>
+<section id="sartorius-cell-instance-segmentation">
+<h2>Sartorius Cell Instance Segmentation<a class="headerlink" href="#sartorius-cell-instance-segmentation" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<p>Este notebook implementa el pipeline de preprocesamiento basado en los hallazgos del EDA:</p>
+<ul class="simple">
+<li><p><strong>606 imágenes</strong> de tamaño uniforme 704×520 px</p></li>
+<li><p><strong>3 tipos celulares</strong>: <code class="docutils literal notranslate"><span class="pre">astro</span></code>, <code class="docutils literal notranslate"><span class="pre">cort</span></code>, <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> con morfologías muy distintas</p></li>
+<li><p><strong>73,585 máscaras</strong> en formato RLE</p></li>
+<li><p>Células desde 46 px² hasta 7,126 px² → pipeline cuidadoso con resolución</p></li>
+</ul>
+</section>
+<section id="librerias">
+<h2>1. Librerías<a class="headerlink" href="#librerias" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># Reproducibilidad</span>
+<span class="n">SEED</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PyTorch version : </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CUDA disponible : </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU : </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>PyTorch version : 2.8.0+cu128
+CUDA disponible : True
+GPU : NVIDIA GeForce RTX 4050 Laptop GPU
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="configuracion">
+<h2>2. Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">config</span><span class="p">:</span>
+    <span class="n">DIRECTORY_PATH</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">Users</span><span class="se">\\</span><span class="s1">Hp</span><span class="se">\\</span><span class="s1">Documents</span><span class="se">\\</span><span class="s1">Deep_learning</span><span class="se">\\</span><span class="s1">Imagenes</span><span class="se">\\</span><span class="s1">sartorius-cell-instance-segmentation&#39;</span>
+    <span class="n">TRAIN_CSV</span>      <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">train.csv&#39;</span>
+    <span class="n">TRAIN_PATH</span>     <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">train&#39;</span>
+    <span class="n">TEST_PATH</span>      <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">test&#39;</span>
+    <span class="n">SEED</span>           <span class="o">=</span> <span class="n">SEED</span>
+
+    <span class="c1"># Resoluciones objetivo</span>
+    <span class="c1"># 512x512: preserva detalle para células pequeñas (mín 46 px² detectado en EDA)</span>
+    <span class="c1"># 256x256: para pruebas rápidas (riesgo de perder células pequeñas)</span>
+    <span class="n">IMG_SIZE_512</span> <span class="o">=</span> <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+    <span class="n">IMG_SIZE_256</span> <span class="o">=</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+    <span class="n">IMG_SIZE</span>     <span class="o">=</span> <span class="n">IMG_SIZE_512</span>   <span class="c1"># resolución activa</span>
+
+    <span class="c1"># Normalización ImageNet (para backbones preentrenados)</span>
+    <span class="n">MEAN</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">]</span>
+    <span class="n">STD</span>  <span class="o">=</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+
+    <span class="c1"># Split estratificado por cell_type</span>
+    <span class="n">VAL_FRACTION</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resolución activa : </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directorio        : </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">DIRECTORY_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Resolución activa : (512, 512)
+Directorio        : C:\\Users\\Hp\\Documents\\Deep_learning\\Imagenes\\sartorius-cell-instance-segmentation
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="carga-de-datos">
+<h2>3. Carga de datos<a class="headerlink" href="#carga-de-datos" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">TRAIN_CSV</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape df_train : </span><span class="si">{</span><span class="n">df_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">df_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shape df_train : (73585, 9)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>annotation</th>
+      <th>width</th>
+      <th>height</th>
+      <th>cell_type</th>
+      <th>plate_time</th>
+      <th>sample_date</th>
+      <th>sample_id</th>
+      <th>elapsed_timedelta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0030fd0e6378</td>
+      <td>118145 6 118849 7 119553 8 120257 8 120961 9 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0030fd0e6378</td>
+      <td>189036 1 189739 3 190441 6 191144 7 191848 8 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0030fd0e6378</td>
+      <td>173567 3 174270 5 174974 5 175678 6 176382 7 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0030fd0e6378</td>
+      <td>196723 4 197427 6 198130 7 198834 8 199538 8 2...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0030fd0e6378</td>
+      <td>167818 3 168522 5 169225 7 169928 8 170632 9 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Distribución de máscaras por cell_type:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_train</span><span class="p">[</span><span class="s2">&quot;cell_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Imágenes únicas: </span><span class="si">{</span><span class="n">df_train</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Distribución de máscaras por cell_type:
+cell_type
+shsy5y    52286
+cort      10777
+astro     10522
+Name: count, dtype: int64
+
+Imágenes únicas: 606
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="funciones-auxiliares">
+<h2>4. Funciones auxiliares<a class="headerlink" href="#funciones-auxiliares" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">rle_decode</span><span class="p">(</span><span class="n">mask_rle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decodifica RLE a máscara binaria.</span>
+<span class="sd">    mask_rle : string RLE (start length)</span>
+<span class="sd">    shape    : (height, width)</span>
+<span class="sd">    returns  : np.ndarray uint8 (h, w) con 0/1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">mask_rle</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+    <span class="n">starts</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">ends</span>    <span class="o">=</span> <span class="n">starts</span> <span class="o">+</span> <span class="n">lengths</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">):</span>
+        <span class="n">img</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rle_encode</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Codifica máscara binaria a string RLE.&quot;&quot;&quot;</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pixels</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">runs</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">pixels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">runs</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load_image_rgb</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Carga imagen en formato RGB (H, W, 3) uint8.&quot;&quot;&quot;</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No se pudo cargar: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Funciones RLE y carga definidas&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Funciones RLE y carga definidas
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="construccion-del-dataframe-por-imagen">
+<h2>5. Construcción del DataFrame por imagen<a class="headerlink" href="#construccion-del-dataframe-por-imagen" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">build_dataframe_light</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">images_path</span><span class="p">):</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">img_id</span><span class="p">,</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">df_train</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Indexando imágenes&quot;</span><span class="p">):</span>
+        <span class="n">h</span>         <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">w</span>         <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cell_type</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s2">&quot;cell_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">images_path</span><span class="p">,</span> <span class="n">img_id</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+        <span class="n">rles</span>       <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s2">&quot;annotation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;id_imagen&quot;</span><span class="p">:</span> <span class="n">img_id</span><span class="p">,</span> <span class="s2">&quot;ruta_imagen&quot;</span><span class="p">:</span> <span class="n">image_path</span><span class="p">,</span>
+                        <span class="s2">&quot;cell_type&quot;</span><span class="p">:</span> <span class="n">cell_type</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+                        <span class="s2">&quot;rles&quot;</span><span class="p">:</span> <span class="n">rles</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+
+
+<span class="n">df_img</span> <span class="o">=</span> <span class="n">build_dataframe_light</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">TRAIN_PATH</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;df_img listo: </span><span class="si">{</span><span class="n">df_img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">df_img</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Indexando imágenes: 100%|██████████| 606/606 [00:00&lt;00:00, 8455.22it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>df_img listo: (606, 6)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id_imagen</th>
+      <th>ruta_imagen</th>
+      <th>cell_type</th>
+      <th>width</th>
+      <th>height</th>
+      <th>rles</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0030fd0e6378</td>
+      <td>C:\\Users\\Hp\\Documents\\Deep_learning\\Image...</td>
+      <td>shsy5y</td>
+      <td>704</td>
+      <td>520</td>
+      <td>[118145 6 118849 7 119553 8 120257 8 120961 9 ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0140b3c8f445</td>
+      <td>C:\\Users\\Hp\\Documents\\Deep_learning\\Image...</td>
+      <td>astro</td>
+      <td>704</td>
+      <td>520</td>
+      <td>[32499 3 33201 7 33902 9 34604 10 35306 11 360...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>01ae5a43a2ab</td>
+      <td>C:\\Users\\Hp\\Documents\\Deep_learning\\Image...</td>
+      <td>cort</td>
+      <td>704</td>
+      <td>520</td>
+      <td>[241026 3 241726 9 242427 13 243130 14 243834 ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>026b3c2c4b32</td>
+      <td>C:\\Users\\Hp\\Documents\\Deep_learning\\Image...</td>
+      <td>cort</td>
+      <td>704</td>
+      <td>520</td>
+      <td>[170753 5 171454 12 172158 13 172862 13 173565...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>029e5b3b89c7</td>
+      <td>C:\\Users\\Hp\\Documents\\Deep_learning\\Image...</td>
+      <td>cort</td>
+      <td>704</td>
+      <td>520</td>
+      <td>[139142 7 139845 10 140548 13 141251 15 141955...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="paso-1-normalizacion">
+<h2>6. Paso 1 — Normalización<a class="headerlink" href="#paso-1-normalizacion" title="Link to this heading">#</a></h2>
+<p>Del EDA: histogramas RGB muestran distribución sesgada hacia bajos valores (fondo oscuro de microscopía).<br />
+Se implementan <strong>dos estrategias</strong>:</p>
+<ul class="simple">
+<li><p><strong>Simple</strong> (<code class="docutils literal notranslate"><span class="pre">/255.0</span></code>): escala a [0,1] — rápida, para modelos desde cero</p></li>
+<li><p><strong>ImageNet</strong>: normalización estándar — necesaria con backbones preentrenados (ResNet, EfficientNet)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">normalize_simple</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalización simple: img / 255.0 → float32 en [0, 1]</span>
+<span class="sd">    Equivalente a la división básica del enunciado: img = img / 255.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">img</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_imagenet</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">mean</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>
+                        <span class="n">std</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">STD</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalización ImageNet: (img/255 - mean) / std</span>
+<span class="sd">    Para uso con backbones preentrenados.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">std</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">std</span><span class="p">,</span>  <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">img</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+
+
+<span class="c1"># Verificación</span>
+<span class="n">dummy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="p">(</span><span class="mi">520</span><span class="p">,</span> <span class="mi">704</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">norm_simple</span> <span class="o">=</span> <span class="n">normalize_simple</span><span class="p">(</span><span class="n">dummy</span><span class="p">)</span>
+<span class="n">norm_imgnet</span> <span class="o">=</span> <span class="n">normalize_imagenet</span><span class="p">(</span><span class="n">dummy</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Normalización simple  →  min: </span><span class="si">{:.3f}</span><span class="s2">  max: </span><span class="si">{:.3f}</span><span class="s2">  dtype: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">norm_simple</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">norm_simple</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">norm_simple</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Normalización ImageNet→  min: </span><span class="si">{:.3f}</span><span class="s2">  max: </span><span class="si">{:.3f}</span><span class="s2">  dtype: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">norm_imgnet</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">norm_imgnet</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">norm_imgnet</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Normalización simple  →  min: 0.000  max: 1.000  dtype: float32
+Normalización ImageNet→  min: -2.118  max: 2.640  dtype: float32
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="paso-2-redimensionamiento">
+<h2>7. Paso 2 — Redimensionamiento<a class="headerlink" href="#paso-2-redimensionamiento" title="Link to this heading">#</a></h2>
+<p><strong>Decisión basada en el EDA:</strong></p>
+<ul class="simple">
+<li><p>Imagen original: <strong>704 × 520 px</strong></p></li>
+<li><p>Célula mínima detectada: <strong>46 px²</strong> (~7×7 px)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">512×512</span></code>: <strong>recomendado</strong> — preserva detalle de células pequeñas de <code class="docutils literal notranslate"><span class="pre">cort</span></code> y <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">256×256</span></code>: solo para experimentos rápidos — riesgo de perder instancias pequeñas</p></li>
+</ul>
+<p>Las máscaras se redimensionan con <strong>INTER_NEAREST</strong> para preservar valores binarios exactos.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">resize_image</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Redimensiona imagen. INTER_LINEAR para imágenes (suaviza bien).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resize_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Redimensiona máscara binaria. INTER_NEAREST preserva valores 0/1.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">)</span>
+
+
+<span class="c1"># Verificación</span>
+<span class="n">dummy_img</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="p">(</span><span class="mi">520</span><span class="p">,</span> <span class="mi">704</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">dummy_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>   <span class="p">(</span><span class="mi">520</span><span class="p">,</span> <span class="mi">704</span><span class="p">),</span>    <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">r_img</span>  <span class="o">=</span> <span class="n">resize_image</span><span class="p">(</span><span class="n">dummy_img</span><span class="p">)</span>
+<span class="n">r_mask</span> <span class="o">=</span> <span class="n">resize_mask</span><span class="p">(</span><span class="n">dummy_mask</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Imagen original : </span><span class="si">{</span><span class="n">dummy_img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">  →  redimensionada: </span><span class="si">{</span><span class="n">r_img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Máscara original: </span><span class="si">{</span><span class="n">dummy_mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> →  redimensionada: </span><span class="si">{</span><span class="n">r_mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Valores únicos en máscara: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">r_mask</span><span class="p">)</span><span class="si">}</span><span class="s2">  (debe ser [0 1])&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Imagen original : (520, 704, 3)  →  redimensionada: (512, 512, 3)
+Máscara original: (520, 704) →  redimensionada: (512, 512)
+Valores únicos en máscara: [0 1]  (debe ser [0 1])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="paso-3-conversion-de-mascaras-rle-binaria-tensor">
+<h2>8. Paso 3 — Conversión de máscaras: RLE → Binaria → Tensor<a class="headerlink" href="#paso-3-conversion-de-mascaras-rle-binaria-tensor" title="Link to this heading">#</a></h2>
+<p>Pipeline por máscara:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>RLE string → np.ndarray binario (H,W) → resize → stack → torch.Tensor (N,H,W)
+</pre></div>
+</div>
+<p>Se genera una <strong>máscara de instancias apilada</strong> <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">H,</span> <span class="pre">W)</span></code> donde N = número de células.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">rle_to_tensor</span><span class="p">(</span><span class="n">rle_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                  <span class="n">original_shape</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">520</span><span class="p">,</span> <span class="mi">704</span><span class="p">),</span>
+                  <span class="n">target_size</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convierte lista de RLE strings en tensor de máscaras de instancias.</span>
+<span class="sd">    Retorna torch.Tensor (N, H, W) dtype=uint8</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">rle</span> <span class="ow">in</span> <span class="n">rle_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">rle</span><span class="p">)</span> <span class="ow">or</span> <span class="n">rle</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">rle_decode</span><span class="p">(</span><span class="n">rle</span><span class="p">,</span> <span class="n">original_shape</span><span class="p">)</span>        <span class="c1"># np (H,W)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">resize_mask</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">target_size</span><span class="p">)</span>        <span class="c1"># np (H&#39;,W&#39;)</span>
+        <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">target_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">image_to_tensor</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;np.ndarray (H,W,3) float32 → torch.Tensor (3,H,W) float32&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+
+<span class="c1"># Verificación con RLE sintético</span>
+<span class="n">dummy_mask_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">520</span><span class="p">,</span> <span class="mi">704</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">dummy_mask_np</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">:</span><span class="mi">280</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">dummy_rle</span> <span class="o">=</span> <span class="n">rle_encode</span><span class="p">(</span><span class="n">dummy_mask_np</span><span class="p">)</span>
+
+<span class="n">tensor_masks</span> <span class="o">=</span> <span class="n">rle_to_tensor</span><span class="p">([</span><span class="n">dummy_rle</span><span class="p">],</span> <span class="n">original_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">520</span><span class="p">,</span> <span class="mi">704</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tensor de máscaras : shape=</span><span class="si">{</span><span class="n">tensor_masks</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">  dtype=</span><span class="si">{</span><span class="n">tensor_masks</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Valores únicos     : </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tensor_masks</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">  (debe ser [0, 1])&quot;</span><span class="p">)</span>
+
+<span class="n">dummy_f</span> <span class="o">=</span> <span class="n">normalize_simple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">256</span><span class="p">,(</span><span class="mi">512</span><span class="p">,</span><span class="mi">512</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+<span class="n">t_img</span> <span class="o">=</span> <span class="n">image_to_tensor</span><span class="p">(</span><span class="n">dummy_f</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tensor de imagen   : shape=</span><span class="si">{</span><span class="n">t_img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">  dtype=</span><span class="si">{</span><span class="n">t_img</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tensor de máscaras : shape=torch.Size([1, 512, 512])  dtype=torch.uint8
+Valores únicos     : [0, 1]  (debe ser [0, 1])
+Tensor de imagen   : shape=torch.Size([3, 512, 512])  dtype=torch.float32
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="paso-4-data-augmentation">
+<h2>9. Paso 4 — Data Augmentation<a class="headerlink" href="#paso-4-data-augmentation" title="Link to this heading">#</a></h2>
+<p><strong>Justificación desde el EDA:</strong></p>
+<ul class="simple">
+<li><p>Solo 606 imágenes → augmentation crítico para evitar overfitting</p></li>
+<li><p>Morfología muy distinta entre tipos celulares → augmentations geométricos aumentan variabilidad</p></li>
+<li><p><strong>Regla clave</strong>: todos los augmentations geométricos se aplican igual a imagen Y máscaras</p></li>
+</ul>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Augmentation</p></th>
+<th class="head"><p>Justificación biológica</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Flip horizontal/vertical</p></td>
+<td><p>Las células no tienen orientación preferida en microscopía</p></td>
+</tr>
+<tr class="row-odd"><td><p>Rotación 90°/180°/270°</p></td>
+<td><p>Imágenes de microscopio son isotrópicas</p></td>
+</tr>
+<tr class="row-even"><td><p>Zoom (crop aleatorio)</p></td>
+<td><p>Simula variación de magnificación del objetivo</p></td>
+</tr>
+<tr class="row-odd"><td><p>Deformación elástica (opcional)</p></td>
+<td><p>Simula variabilidad morfológica real de membranas</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">random_horizontal_flip</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flip horizontal consistente imagen + máscaras.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+        <span class="n">img</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>   <span class="c1"># eje W</span>
+    <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">masks</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">random_vertical_flip</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flip vertical consistente imagen + máscaras.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+        <span class="n">img</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>   <span class="c1"># eje H</span>
+    <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">masks</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">random_rotation_90</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotación aleatoria en multiplos de 90deg. k∈{0,1,2,3} → 0,90,180,270.&quot;&quot;&quot;</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">img</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">img</span><span class="p">,</span>   <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">masks</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">random_zoom_crop</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                     <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                     <span class="n">target_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Zoom mediante crop aleatorio + resize al tamaño destino.</span>
+<span class="sd">    Simula variacion de magnificacion del microscopio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">*</span><span class="n">scale_range</span><span class="p">)</span>
+    <span class="n">new_H</span><span class="p">,</span> <span class="n">new_W</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">H</span> <span class="o">*</span> <span class="n">scale</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">W</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="n">top</span>  <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="n">new_H</span><span class="p">)</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">W</span> <span class="o">-</span> <span class="n">new_W</span><span class="p">)</span>
+
+    <span class="n">img_crop</span>   <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">top</span><span class="o">+</span><span class="n">new_H</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">left</span><span class="o">+</span><span class="n">new_W</span><span class="p">]</span>
+    <span class="n">masks_crop</span> <span class="o">=</span> <span class="n">masks</span><span class="p">[:,</span> <span class="n">top</span><span class="p">:</span><span class="n">top</span><span class="o">+</span><span class="n">new_H</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">left</span><span class="o">+</span><span class="n">new_W</span><span class="p">]</span>
+
+    <span class="n">img_out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_crop</span><span class="p">,</span> <span class="p">(</span><span class="n">target_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                         <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">)</span>
+    <span class="n">masks_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">target_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                   <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks_crop</span>
+    <span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img_out</span><span class="p">,</span> <span class="n">masks_out</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">elastic_deformation</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                         <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">34.0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deformacion elastica (opcional) — simula variabilidad morfologica</span>
+<span class="sd">    de membranas celulares. Requiere scipy.</span>
+<span class="sd">    alpha: intensidad del desplazamiento</span>
+<span class="sd">    sigma: suavizado Gaussiano del campo de deformacion</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_filter</span>
+
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">W</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="n">map_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">W</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">map_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">dy</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">H</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">img_def</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">remap</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">map_x</span><span class="p">,</span> <span class="n">map_y</span><span class="p">,</span>
+                         <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">,</span>
+                         <span class="n">borderMode</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_REFLECT_101</span><span class="p">)</span>
+    <span class="n">masks_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">remap</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">map_x</span><span class="p">,</span> <span class="n">map_y</span><span class="p">,</span>
+                  <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">,</span>
+                  <span class="n">borderMode</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_REFLECT_101</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span>
+    <span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img_def</span><span class="p">,</span> <span class="n">masks_def</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Funciones de augmentation definidas:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  · random_horizontal_flip&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  · random_vertical_flip&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  · random_rotation_90&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  · random_zoom_crop&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  · elastic_deformation (opcional)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Funciones de augmentation definidas:
+  · random_horizontal_flip
+  · random_vertical_flip
+  · random_rotation_90
+  · random_zoom_crop
+  · elastic_deformation (opcional)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="pipeline-de-preprocesamiento-completo">
+<h2>10. Pipeline de preprocesamiento completo<a class="headerlink" href="#pipeline-de-preprocesamiento-completo" title="Link to this heading">#</a></h2>
+<p>Función que encadena todos los pasos en el orden correcto:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Carga → Decode RLE → Resize → Normalización → Augmentation (train) → Tensor
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">preprocess</span><span class="p">(</span><span class="n">img_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+               <span class="n">rle_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+               <span class="n">target_size</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">,</span>
+               <span class="n">is_train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">use_elastic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="n">normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;imagenet&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pipeline completo de preprocesamiento para Sartorius.</span>
+
+<span class="sd">    Parametros</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img_path     : ruta completa a la imagen</span>
+<span class="sd">    rle_list     : lista de RLE strings (una por instancia celular)</span>
+<span class="sd">    target_size  : (H, W) destino</span>
+<span class="sd">    is_train     : si True aplica data augmentation</span>
+<span class="sd">    use_elastic  : activa deformacion elastica (mas lento)</span>
+<span class="sd">    normalization: &#39;simple&#39; (div 255) o &#39;imagenet&#39; (mean/std)</span>
+
+<span class="sd">    Retorna</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict con:</span>
+<span class="sd">        &#39;image&#39; : torch.Tensor (3, H, W) float32</span>
+<span class="sd">        &#39;masks&#39; : torch.Tensor (N, H, W) uint8</span>
+<span class="sd">        &#39;meta&#39;  : dict con path, n_masks, size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Carga</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">load_image_rgb</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>                         <span class="c1"># (H, W, 3) uint8</span>
+
+    <span class="c1"># 2. Decode RLE → stack de mascaras (N, H_orig, W_orig)</span>
+    <span class="n">masks_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">rle_decode</span><span class="p">(</span><span class="n">rle</span><span class="p">,</span> <span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                  <span class="k">for</span> <span class="n">rle</span> <span class="ow">in</span> <span class="n">rle_list</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">rle</span><span class="p">)</span> <span class="ow">and</span> <span class="n">rle</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">masks_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">masks_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">masks_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">masks_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>             <span class="c1"># (N, H, W)</span>
+
+    <span class="c1"># 3. Redimensionamiento</span>
+    <span class="n">img</span>      <span class="o">=</span> <span class="n">resize_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">target_size</span><span class="p">)</span>
+    <span class="n">masks_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">resize_mask</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">target_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks_np</span><span class="p">])</span>
+
+    <span class="c1"># 4. Data augmentation (solo entrenamiento)</span>
+    <span class="k">if</span> <span class="n">is_train</span><span class="p">:</span>
+        <span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span> <span class="o">=</span> <span class="n">random_horizontal_flip</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span><span class="p">)</span>
+        <span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span> <span class="o">=</span> <span class="n">random_vertical_flip</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span><span class="p">)</span>
+        <span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span> <span class="o">=</span> <span class="n">random_rotation_90</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span><span class="p">)</span>
+        <span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span> <span class="o">=</span> <span class="n">random_zoom_crop</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span><span class="p">,</span> <span class="n">target_size</span><span class="o">=</span><span class="n">target_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_elastic</span><span class="p">:</span>
+            <span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span> <span class="o">=</span> <span class="n">elastic_deformation</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks_np</span><span class="p">)</span>
+
+    <span class="c1"># 5. Normalizacion</span>
+    <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
+        <span class="n">img_float</span> <span class="o">=</span> <span class="n">normalize_simple</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">img_float</span> <span class="o">=</span> <span class="n">normalize_imagenet</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="c1"># 6. Conversion a tensores</span>
+    <span class="n">img_tensor</span>   <span class="o">=</span> <span class="n">image_to_tensor</span><span class="p">(</span><span class="n">img_float</span><span class="p">)</span>              <span class="c1"># (3, H, W)</span>
+    <span class="n">masks_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">masks_np</span><span class="p">)</span>              <span class="c1"># (N, H, W)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;image&#39;</span> <span class="p">:</span> <span class="n">img_tensor</span><span class="p">,</span>
+        <span class="s1">&#39;masks&#39;</span> <span class="p">:</span> <span class="n">masks_tensor</span><span class="p">,</span>
+        <span class="s1">&#39;meta&#39;</span>  <span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">img_path</span><span class="p">,</span> <span class="s1">&#39;n_masks&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">masks_list</span><span class="p">),</span>
+                   <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">target_size</span><span class="p">}</span>
+    <span class="p">}</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pipeline preprocess() definido&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Pipeline preprocess() definido
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="split-train-validacion-estratificado-por-cell-type">
+<h2>11. Split Train / Validación estratificado por cell_type<a class="headerlink" href="#split-train-validacion-estratificado-por-cell-type" title="Link to this heading">#</a></h2>
+<p><strong>Del EDA:</strong> los 3 tipos celulares tienen morfologías radicalmente distintas:<br />
+<code class="docutils literal notranslate"><span class="pre">astro</span></code> (área media ~803 px²) vs <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> (~287 px²) vs <code class="docutils literal notranslate"><span class="pre">cort</span></code> (~182 px²).<br />
+Un split aleatorio podría generar data leakage de tipo celular. Se usa <strong>stratify</strong>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">StratifiedKFold</span>
+
+<span class="c1"># ── Usar TODO el dataframe ──────────────────────────────────────────────────</span>
+<span class="n">df_split</span> <span class="o">=</span> <span class="n">df_img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># ── Paso 1: separar Test (15%) ──────────────────────────────────────────────</span>
+<span class="n">df_trainval</span><span class="p">,</span> <span class="n">df_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">df_split</span><span class="p">,</span>
+    <span class="n">test_size</span>    <span class="o">=</span> <span class="mf">0.15</span><span class="p">,</span>
+    <span class="n">stratify</span>     <span class="o">=</span> <span class="n">df_split</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">],</span>
+    <span class="n">random_state</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">SEED</span>
+<span class="p">)</span>
+
+<span class="c1"># ── Paso 2: separar Validation (15% total) ─────────────────────────────────</span>
+<span class="n">df_train_base</span><span class="p">,</span> <span class="n">df_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">df_trainval</span><span class="p">,</span>
+    <span class="n">test_size</span>    <span class="o">=</span> <span class="mf">0.15</span> <span class="o">/</span> <span class="mf">0.85</span><span class="p">,</span>
+    <span class="n">stratify</span>     <span class="o">=</span> <span class="n">df_trainval</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">],</span>
+    <span class="n">random_state</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">SEED</span>
+<span class="p">)</span>
+
+<span class="c1"># ── Paso 3: K-Fold sobre TRAIN ──────────────────────────────────────────────</span>
+<span class="n">skf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span>
+    <span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">SEED</span>
+<span class="p">)</span>
+
+<span class="n">folds</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">fold_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">val_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+    <span class="n">skf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">df_train_base</span><span class="p">,</span> <span class="n">df_train_base</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">])</span>
+<span class="p">):</span>
+
+    <span class="n">folds</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;fold&#39;</span>      <span class="p">:</span> <span class="n">fold_idx</span><span class="p">,</span>
+        <span class="s1">&#39;train_ids&#39;</span> <span class="p">:</span> <span class="n">df_train_base</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">][</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="s1">&#39;val_ids&#39;</span>   <span class="p">:</span> <span class="n">df_train_base</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">val_idx</span><span class="p">][</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="p">})</span>
+
+<span class="c1"># ── Resumen ─────────────────────────────────────────────────────────────────</span>
+<span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_img</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total imágenes : </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train base     : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_train_base</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_train_base</span><span class="p">)</span><span class="o">/</span><span class="n">total</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation     : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_val</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_val</span><span class="p">)</span><span class="o">/</span><span class="n">total</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test           : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_test</span><span class="p">)</span><span class="o">/</span><span class="n">total</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total imágenes : 606
+Train base     : 424 (70.0%)
+Validation     : 91 (15.0%)
+Test           : 91 (15.0%)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="clase-dataset-pytorch">
+<h2>12. Clase Dataset PyTorch<a class="headerlink" href="#clase-dataset-pytorch" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SartoriusDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataset de Sartorius Cell Instance Segmentation.</span>
+
+<span class="sd">    Cada item retorna:</span>
+<span class="sd">        image : torch.Tensor (3, H, W) float32  — imagen normalizada</span>
+<span class="sd">        masks : torch.Tensor (N, H, W) uint8    — mascaras de instancias</span>
+<span class="sd">        meta  : dict con id, cell_type, n_masks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">target_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">,</span>
+                 <span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;imagenet&#39;</span><span class="p">,</span>
+                 <span class="n">use_elastic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span>            <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_train</span>      <span class="o">=</span> <span class="n">is_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span>   <span class="o">=</span> <span class="n">target_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="n">normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_elastic</span>   <span class="o">=</span> <span class="n">use_elastic</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span>
+            <span class="n">img_path</span>      <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;ruta_imagen&#39;</span><span class="p">],</span>
+            <span class="n">rle_list</span>      <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;rles&#39;</span><span class="p">],</span>
+            <span class="n">target_size</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">,</span>
+            <span class="n">is_train</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_train</span><span class="p">,</span>
+            <span class="n">use_elastic</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_elastic</span><span class="p">,</span>
+            <span class="n">normalization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span>
+        <span class="p">)</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>        <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;cell_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="c1"># ── Datasets oficiales ──────────────────────────────────────────────────────</span>
+<span class="n">ds_train</span> <span class="o">=</span> <span class="n">SartoriusDataset</span><span class="p">(</span><span class="n">df_train_base</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds_val</span>   <span class="o">=</span> <span class="n">SartoriusDataset</span><span class="p">(</span><span class="n">df_val</span><span class="p">,</span>        <span class="n">is_train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ds_test</span>  <span class="o">=</span> <span class="n">SartoriusDataset</span><span class="p">(</span><span class="n">df_test</span><span class="p">,</span>       <span class="n">is_train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># ── Verificación ────────────────────────────────────────────────────────────</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="n">ds_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Verificacion SartoriusDataset ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image  shape : </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">   dtype: </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;masks  shape : </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;masks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">   dtype: </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;masks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cell_type    : </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;cell_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_masks      : </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;n_masks&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset train : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ds_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset val   : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ds_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset test  : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ds_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== Verificacion SartoriusDataset ===
+image  shape : torch.Size([3, 512, 512])   dtype: torch.float32
+masks  shape : torch.Size([321, 512, 512])   dtype: torch.uint8
+cell_type    : shsy5y
+n_masks      : 321
+
+Dataset train : 424
+Dataset val   : 91
+Dataset test  : 91
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="entregable-comparacion-visual-original-vs-procesada">
+<h2>13. Entregable — Comparación visual: Original vs Procesada<a class="headerlink" href="#entregable-comparacion-visual-original-vs-procesada" title="Link to this heading">#</a></h2>
+<p>Una imagen por tipo celular (<code class="docutils literal notranslate"><span class="pre">astro</span></code>, <code class="docutils literal notranslate"><span class="pre">cort</span></code>, <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code>) mostrando:</p>
+<ul class="simple">
+<li><p><strong>Izquierda (azul)</strong>: imagen original con máscaras superpuestas</p></li>
+<li><p><strong>Derecha (naranja)</strong>: imagen preprocesada (512×512, normalizada, augmentation aplicado)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">overlay_masks_np</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                      <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.45</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Superpone N mascaras sobre imagen RGB con colores HUSL.&quot;&quot;&quot;</span>
+    <span class="n">overlay</span> <span class="o">=</span> <span class="n">img_rgb</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s1">&#39;husl&#39;</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">masks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">mask</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">palette</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
+        <span class="n">overlay</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlay</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">alpha</span>
+    <span class="k">return</span> <span class="n">overlay</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">tensor_to_display</span><span class="p">(</span><span class="n">img_tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+                       <span class="n">normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;imagenet&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tensor (3,H,W) float32 → imagen uint8 (H,W,3) para imshow.&quot;&quot;&quot;</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img_tensor</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;imagenet&#39;</span><span class="p">:</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">MEAN</span><span class="p">)</span>
+        <span class="n">std</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">STD</span><span class="p">)</span>
+        <span class="n">img</span>  <span class="o">=</span> <span class="n">img</span> <span class="o">*</span> <span class="n">std</span> <span class="o">+</span> <span class="n">mean</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+
+<span class="c1"># ── Figura principal ─────────────────────────────────────────────────────</span>
+<span class="n">NORM</span>       <span class="o">=</span> <span class="s1">&#39;imagenet&#39;</span>
+<span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;astro&#39;</span><span class="p">,</span> <span class="s1">&#39;cort&#39;</span><span class="p">,</span> <span class="s1">&#39;shsy5y&#39;</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="s1">&#39;Preprocesamiento: Original vs Procesado</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="s1">&#39;(512x512 | Normalizacion ImageNet | Data Augmentation activo)&#39;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">row_idx</span><span class="p">,</span> <span class="n">ctype</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cell_types</span><span class="p">):</span>
+
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">df_img</span><span class="p">[</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ctype</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Original</span>
+    <span class="n">img_orig</span>     <span class="o">=</span> <span class="n">load_image_rgb</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;ruta_imagen&#39;</span><span class="p">])</span>
+    <span class="n">masks_orig</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">rle_decode</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]))</span>
+                             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;rles&#39;</span><span class="p">]])</span>
+    <span class="n">orig_overlay</span> <span class="o">=</span> <span class="n">overlay_masks_np</span><span class="p">(</span><span class="n">img_orig</span><span class="p">,</span> <span class="n">masks_orig</span><span class="p">)</span>
+
+    <span class="c1"># Procesada</span>
+    <span class="n">result</span>       <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span>
+        <span class="n">img_path</span><span class="o">=</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;ruta_imagen&#39;</span><span class="p">],</span> <span class="n">rle_list</span><span class="o">=</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;rles&#39;</span><span class="p">],</span>
+        <span class="n">target_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_elastic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="n">NORM</span>
+    <span class="p">)</span>
+    <span class="n">img_proc</span>     <span class="o">=</span> <span class="n">tensor_to_display</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="n">normalization</span><span class="o">=</span><span class="n">NORM</span><span class="p">)</span>
+    <span class="n">masks_proc</span>   <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;masks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">proc_overlay</span> <span class="o">=</span> <span class="n">overlay_masks_np</span><span class="p">(</span><span class="n">img_proc</span><span class="p">,</span> <span class="n">masks_proc</span><span class="p">)</span>
+
+    <span class="c1"># Plot</span>
+    <span class="n">ax_orig</span><span class="p">,</span> <span class="n">ax_proc</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">row_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="n">row_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">ax_orig</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">orig_overlay</span><span class="p">)</span>
+    <span class="n">ax_orig</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">ctype</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">]  Original</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">img_orig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">img_orig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> px  |  &#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">masks_orig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> celulas&#39;</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span>
+    <span class="p">)</span>
+    <span class="n">ax_orig</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="n">ax_proc</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">proc_overlay</span><span class="p">)</span>
+    <span class="n">ax_proc</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">ctype</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">]  Procesada (</span><span class="si">{</span><span class="n">NORM</span><span class="si">}</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> px  |  &#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">masks_proc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> instancias&#39;</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span>
+    <span class="p">)</span>
+    <span class="n">ax_proc</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Recuadro color por columna</span>
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">ax_orig</span><span class="p">,</span> <span class="s1">&#39;#4e79a7&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">ax_proc</span><span class="p">,</span> <span class="s1">&#39;#f28e2b&#39;</span><span class="p">)]:</span>
+        <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">spine</span><span class="o">.</span><span class="n">set_edgecolor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+            <span class="n">spine</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">spine</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;preprocessing_comparison.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Figura guardada: preprocessing_comparison.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/2a4f120261acfd168d7e56d41cf085a3bd7a9e20c857174694e98c045537ab66.png" src="../../_images/2a4f120261acfd168d7e56d41cf085a3bd7a9e20c857174694e98c045537ab66.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Figura guardada: preprocessing_comparison.png
+</pre></div>
+</div>
+</div>
+</div>
+<p>El pipeline de preprocesamiento logró estandarizar las imágenes hacia una resolución fija de 512×512 píxeles, aplicar normalización basada en ImageNet y realizar aumentos de datos sin comprometer la integridad morfológica ni la alineación de las máscaras de segmentación. Las estructuras celulares permanecieron claramente distinguibles tras el procesamiento, indicando que el pipeline es adecuado para el entrenamiento de modelos de segmentación profunda</p>
+</section>
+<section id="exportacion">
+<h2>14. Exportacion<a class="headerlink" href="#exportacion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="c1"># ── Directorio de exportación ────────────────────────────────────────────────</span>
+<span class="n">EXPORT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./preprocessing_exports&quot;</span><span class="p">)</span>
+<span class="n">EXPORT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># ── Metadata útil para reproducibilidad ──────────────────────────────────────</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;created_at&quot;</span> <span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;pytorch&quot;</span>    <span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+    <span class="s2">&quot;cuda&quot;</span>       <span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span>
+    <span class="s2">&quot;device&quot;</span>     <span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ── Config serializable ──────────────────────────────────────────────────────</span>
+<span class="n">config_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;IMG_SIZE&quot;</span>       <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE</span><span class="p">,</span>
+    <span class="s2">&quot;IMG_SIZE_512&quot;</span>   <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE_512</span><span class="p">,</span>
+    <span class="s2">&quot;IMG_SIZE_256&quot;</span>   <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">IMG_SIZE_256</span><span class="p">,</span>
+
+    <span class="s2">&quot;MEAN&quot;</span>           <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>
+    <span class="s2">&quot;STD&quot;</span>            <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">STD</span><span class="p">,</span>
+
+    <span class="s2">&quot;SEED&quot;</span>           <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">SEED</span><span class="p">,</span>
+    <span class="s2">&quot;VAL_FRACTION&quot;</span>   <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">VAL_FRACTION</span><span class="p">,</span>
+
+    <span class="c1"># Paths como string</span>
+    <span class="s2">&quot;TRAIN_PATH&quot;</span>     <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">TRAIN_PATH</span><span class="p">),</span>
+    <span class="s2">&quot;TEST_PATH&quot;</span>      <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">TEST_PATH</span><span class="p">),</span>
+    <span class="s2">&quot;DIRECTORY_PATH&quot;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">DIRECTORY_PATH</span><span class="p">),</span>
+
+    <span class="c1"># Modelado</span>
+    <span class="s2">&quot;DEVICE&quot;</span>         <span class="p">:</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PIN_MEMORY&quot;</span>     <span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span>
+    <span class="s2">&quot;NUM_WORKERS&quot;</span>    <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ── Datos exportables ────────────────────────────────────────────────────────</span>
+<span class="n">export_data</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="c1"># DataFrames</span>
+    <span class="s2">&quot;df_img&quot;</span>         <span class="p">:</span> <span class="n">df_img</span><span class="p">,</span>
+    <span class="s2">&quot;df_train_base&quot;</span>  <span class="p">:</span> <span class="n">df_train_base</span><span class="p">,</span>
+    <span class="s2">&quot;df_val&quot;</span>         <span class="p">:</span> <span class="n">df_val</span><span class="p">,</span>
+    <span class="s2">&quot;df_test&quot;</span>        <span class="p">:</span> <span class="n">df_test</span><span class="p">,</span>
+
+    <span class="c1"># Folds CV</span>
+    <span class="s2">&quot;folds&quot;</span>          <span class="p">:</span> <span class="n">folds</span><span class="p">,</span>
+
+    <span class="c1"># Configuración</span>
+    <span class="s2">&quot;config&quot;</span>         <span class="p">:</span> <span class="n">config_dict</span><span class="p">,</span>
+
+    <span class="c1"># Metadata entorno</span>
+    <span class="s2">&quot;metadata&quot;</span>       <span class="p">:</span> <span class="n">metadata</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ── 1. Export Joblib (recomendado) ───────────────────────────────────────────</span>
+<span class="n">joblib_path</span> <span class="o">=</span> <span class="n">EXPORT_DIR</span> <span class="o">/</span> <span class="s2">&quot;preprocessing_data.joblib&quot;</span>
+
+<span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+    <span class="n">export_data</span><span class="p">,</span>
+    <span class="n">joblib_path</span><span class="p">,</span>
+    <span class="n">compress</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Joblib guardado → </span><span class="si">{</span><span class="n">joblib_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Tamaño: </span><span class="si">{</span><span class="n">joblib_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+
+<span class="c1"># ── 2. Export Pickle (backup universal) ─────────────────────────────────────</span>
+<span class="n">pickle_path</span> <span class="o">=</span> <span class="n">EXPORT_DIR</span> <span class="o">/</span> <span class="s2">&quot;preprocessing_data.pkl&quot;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+        <span class="n">export_data</span><span class="p">,</span>
+        <span class="n">f</span><span class="p">,</span>
+        <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span>
+    <span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Pickle guardado → </span><span class="si">{</span><span class="n">pickle_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Tamaño: </span><span class="si">{</span><span class="n">pickle_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+
+<span class="c1"># ── 3. CSVs separados ────────────────────────────────────────────────────────</span>
+<span class="n">df_img</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rles&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+    <span class="n">EXPORT_DIR</span> <span class="o">/</span> <span class="s2">&quot;df_img.csv&quot;</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">df_train_base</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+    <span class="n">EXPORT_DIR</span> <span class="o">/</span> <span class="s2">&quot;df_train.csv&quot;</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">df_val</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+    <span class="n">EXPORT_DIR</span> <span class="o">/</span> <span class="s2">&quot;df_val.csv&quot;</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">df_test</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+    <span class="n">EXPORT_DIR</span> <span class="o">/</span> <span class="s2">&quot;df_test.csv&quot;</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CSVs guardados → </span><span class="si">{</span><span class="n">EXPORT_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># ── 4. Verificación de integridad ────────────────────────────────────────────</span>
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">joblib_path</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;df_img&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">df_img</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;df_train_base&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">df_train_base</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;df_val&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">df_val</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;df_test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">df_test</span><span class="o">.</span><span class="n">shape</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">loaded</span><span class="p">[</span><span class="s2">&quot;folds&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">folds</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Verificación de integridad OK&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  df_img        : </span><span class="si">{</span><span class="n">loaded</span><span class="p">[</span><span class="s1">&#39;df_img&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  df_train_base : </span><span class="si">{</span><span class="n">loaded</span><span class="p">[</span><span class="s1">&#39;df_train_base&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  df_val        : </span><span class="si">{</span><span class="n">loaded</span><span class="p">[</span><span class="s1">&#39;df_val&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  df_test       : </span><span class="si">{</span><span class="n">loaded</span><span class="p">[</span><span class="s1">&#39;df_test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  folds         : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">loaded</span><span class="p">[</span><span class="s1">&#39;folds&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> folds&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  device        : </span><span class="si">{</span><span class="n">loaded</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;DEVICE&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Joblib guardado → preprocessing_exports\preprocessing_data.joblib
+  Tamaño: 16.50 MB
+ Pickle guardado → preprocessing_exports\preprocessing_data.pkl
+  Tamaño: 17.47 MB
+CSVs guardados → preprocessing_exports
+
+ Verificación de integridad OK
+  df_img        : (606, 6)
+  df_train_base : (424, 6)
+  df_val        : (91, 6)
+  df_test       : (91, 6)
+  folds         : 5 folds
+  device        : cuda
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="resumen-del-pipeline">
+<h2>15. Resumen del pipeline<a class="headerlink" href="#resumen-del-pipeline" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Paso</p></th>
+<th class="head"><p>Operacion</p></th>
+<th class="head"><p>Detalle</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><strong>Normalizacion</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">img</span> <span class="pre">/</span> <span class="pre">255.0</span></code> (simple) o <code class="docutils literal notranslate"><span class="pre">(img/255</span> <span class="pre">-</span> <span class="pre">mean)</span> <span class="pre">/</span> <span class="pre">std</span></code> (ImageNet)</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><strong>Redimensionamiento</strong></p></td>
+<td><p>704×520 → 512×512</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><strong>RLE → Tensor</strong></p></td>
+<td><p>RLE → binaria (H,W) → stack → Tensor (N,H,W) uint8</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><strong>Augmentation</strong></p></td>
+<td><p>H-flip, V-flip, rot90, zoom-crop, elastic (opcional)</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p><strong>Split</strong></p></td>
+<td><p>80/20 estratificado por <code class="docutils literal notranslate"><span class="pre">cell_type</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Decisiones derivadas del EDA:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">512×512</span></code> elegido para preservar células de 46 px² (mínimo detectado)</p></li>
+<li><p>Augmentations aplicados en pareja imagen+máscara para consistencia de instancias</p></li>
+<li><p>Split estratificado por <code class="docutils literal notranslate"><span class="pre">cell_type</span></code> (astro/cort/shsy5y tienen morfologías muy distintas)</p></li>
+<li><p>14 imágenes outlier identificadas en el EDA → considerar filtrarlas antes de entrenar</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/vision"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01_EDA.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Analisis Exploratorio de datos</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03_modelado_sartorius_cellpose.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Modelado — Sartorius Cell Instance Segmentation-Cellpose</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sartorius-cell-instance-segmentation">Sartorius Cell Instance Segmentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#librerias">1. Librerías</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuracion">2. Configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-datos">3. Carga de datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#funciones-auxiliares">4. Funciones auxiliares</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construccion-del-dataframe-por-imagen">5. Construcción del DataFrame por imagen</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-1-normalizacion">6. Paso 1 — Normalización</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-2-redimensionamiento">7. Paso 2 — Redimensionamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-3-conversion-de-mascaras-rle-binaria-tensor">8. Paso 3 — Conversión de máscaras: RLE → Binaria → Tensor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paso-4-data-augmentation">9. Paso 4 — Data Augmentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-de-preprocesamiento-completo">10. Pipeline de preprocesamiento completo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#split-train-validacion-estratificado-por-cell-type">11. Split Train / Validación estratificado por cell_type</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clase-dataset-pytorch">12. Clase Dataset PyTorch</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entregable-comparacion-visual-original-vs-procesada">13. Entregable — Comparación visual: Original vs Procesada</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exportacion">14. Exportacion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resumen-del-pipeline">15. Resumen del pipeline</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mateo Gomez, Mateo Molinares, David Ibañez y Alejandro Moya
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

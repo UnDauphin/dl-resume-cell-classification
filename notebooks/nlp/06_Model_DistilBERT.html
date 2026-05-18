@@ -1,0 +1,1489 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>06 — DistilBERT Fine-tuning para Clasificación de Currículos &#8212; Deep Learning: Segmentación de Células e Interpretación de Texto</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/nlp/06_Model_DistilBERT';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="07 — Comparación de Modelos y Análisis Crítico" href="07_Comparacion_Modelos.html" />
+    <link rel="prev" title="05 — Modelo FastText" href="05_Model_FastText.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Deep Learning: Segmentación de Células e Interpretación de Texto
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 1 — Segmentación de Imágenes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../vision/01_EDA.html">Analisis Exploratorio de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/02_preprocesamiento_sartorius.html">Preprocesamiento para Modelado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/03_modelado_sartorius_cellpose.html">Modelado — Sartorius Cell Instance Segmentation-Cellpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/04_modelado_sartorius_OPTIMIZADO.html">04 — Modelado Sartorius · OPTIMIZADO para Colab Pro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/05_hover-net.html">Modelado — HoVer-Net</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/06_mask_rcnn.html">Modelado — Mask R-CNN con Swin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/07_evaluacion_final.html">Evaluación Final — Sartorius Cell Instance Segmentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 2 — NLP</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_EDA_NLP_Resume.html">Bloque 2 - NLP: EDA y Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Model_TFIDF_XGBoost.html">02 — Modelo Baseline: TF-IDF + XGBoost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Model_CNN1D.html">03 — CNN-1D para Clasificación de Texto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Model_BiLSTM.html">04 — Word2Vec + BiLSTM con Keras Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Model_FastText.html">05 — Modelo FastText</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">06 — DistilBERT Fine-tuning para Clasificación de Currículos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Comparacion_Modelos.html">07 — Comparación de Modelos y Análisis Crítico</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/nlp/06_Model_DistilBERT.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>06 — DistilBERT Fine-tuning para Clasificación de Currículos</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-y-configuracion">0. Imports y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas-y-constantes">1. Rutas y constantes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-artefactos-y-datos">2. Carga de artefactos y datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tokenizacion-con-distilbert-wordpiece">3. Tokenización con DistilBERT WordPiece</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipelines-tf-data-dataset">4. Pipelines <code class="docutils literal notranslate"><span class="pre">tf.data.Dataset</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arquitectura-del-modelo">5. Arquitectura del modelo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-de-implementacion">Decisión de implementación</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estrategia-de-fine-tuning">Estrategia de fine-tuning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizer-con-linear-warmup">6. Optimizer con linear warmup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion-y-callbacks">7. Compilación y callbacks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento">8. Entrenamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-de-entrenamiento">9. Curvas de entrenamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#predicciones-en-test">10. Predicciones en test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-de-evaluacion">11. Métricas de evaluación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-confusion">12. Matrices de confusión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-roc-por-clase">13. Curvas ROC por clase</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-precision-recall-por-clase">14. Curvas Precision-Recall por clase</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardado-de-metricas">15. Guardado de métricas</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="distilbert-fine-tuning-para-clasificacion-de-curriculos">
+<h1>06 — DistilBERT Fine-tuning para Clasificación de Currículos<a class="headerlink" href="#distilbert-fine-tuning-para-clasificacion-de-curriculos" title="Link to this heading">#</a></h1>
+<p><strong>Modelo:</strong> <code class="docutils literal notranslate"><span class="pre">distilbert-base-uncased</span></code> (backbone) + cabeza de clasificación Keras<br />
+<strong>Input:</strong> <code class="docutils literal notranslate"><span class="pre">Resume_str</span></code> crudo — DistilBERT tiene su propio tokenizador WordPiece, no usa <code class="docutils literal notranslate"><span class="pre">clean_text</span></code><br />
+<strong>Clases:</strong> 24 categorías profesionales<br />
+<strong>Split:</strong> 70/15/15 reproducido con <code class="docutils literal notranslate"><span class="pre">random_state=42</span></code> (misma semilla que notebooks anteriores)</p>
+<section id="imports-y-configuracion">
+<h2>0. Imports y configuración<a class="headerlink" href="#imports-y-configuracion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_USE_LEGACY_KERAS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>  <span class="c1"># antes de cualquier import de TF o transformers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">label_binarize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span>
+    <span class="n">classification_report</span><span class="p">,</span> <span class="n">confusion_matrix</span><span class="p">,</span>
+    <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">auc</span><span class="p">,</span>
+    <span class="n">precision_recall_curve</span><span class="p">,</span> <span class="n">average_precision_score</span>
+<span class="p">)</span>
+
+<span class="c1"># ── TensorFlow / Keras ──────────────────────────────────────────────────────</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras</span><span class="w"> </span><span class="kn">import</span> <span class="n">layers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarlyStopping</span><span class="p">,</span> <span class="n">ReduceLROnPlateau</span><span class="p">,</span> <span class="n">ModelCheckpoint</span>
+
+<span class="c1"># ── HuggingFace ─────────────────────────────────────────────────────────────</span>
+<span class="c1"># Usamos TFAutoModel (backbone TF nativo) + cabeza Keras pura.</span>
+<span class="c1"># Evitamos TFDistilBertForSequenceClassification por incompatibilidades</span>
+<span class="c1"># conocidas con Keras 3.x en TF 2.20.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">TFAutoModel</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;TensorFlow : </span><span class="si">{</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Transformers: </span><span class="si">{</span><span class="n">transformers</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">gpus</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GPUs disponibles: </span><span class="si">{</span><span class="n">gpus</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-05-16 22:57:37.112950: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-05-16 22:57:37.178242: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-05-16 22:57:38.299416: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TensorFlow : 2.20.0
+Transformers: 4.35.2
+GPUs disponibles: [PhysicalDevice(name=&#39;/physical_device:GPU:0&#39;, device_type=&#39;GPU&#39;)]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="rutas-y-constantes">
+<h2>1. Rutas y constantes<a class="headerlink" href="#rutas-y-constantes" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BASE_DIR</span>      <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">))</span>
+<span class="n">DATA_PATH</span>     <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;Resume.csv&#39;</span><span class="p">)</span>
+<span class="n">ARTIFACTS_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;artifacts&#39;</span><span class="p">)</span>
+<span class="n">METRICS_DIR</span>   <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;metrics&#39;</span><span class="p">)</span>
+<span class="n">MODELS_DIR</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">METRICS_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span>  <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># ── Hiperparámetros ──────────────────────────────────────────────────────────</span>
+<span class="n">MODEL_NAME</span>   <span class="o">=</span> <span class="s1">&#39;distilbert-base-uncased&#39;</span>
+<span class="n">MAX_LEN</span>      <span class="o">=</span> <span class="mi">256</span>        <span class="c1"># tokens WordPiece — resumes son largos, 256 es balance razonable</span>
+<span class="n">BATCH_SIZE</span>   <span class="o">=</span> <span class="mi">16</span>         <span class="c1"># conservador para caber en GPU con backbone grande</span>
+<span class="n">EPOCHS</span>       <span class="o">=</span> <span class="mi">10</span>         <span class="c1"># con early stopping, rara vez llega al límite</span>
+<span class="n">LR</span>           <span class="o">=</span> <span class="mf">2e-5</span>       <span class="c1"># learning rate canónico para fine-tuning BERT</span>
+<span class="n">WARMUP_RATIO</span> <span class="o">=</span> <span class="mf">0.1</span>        <span class="c1"># 10% de los steps totales como warmup</span>
+<span class="n">RANDOM_STATE</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;BASE_DIR : </span><span class="si">{</span><span class="n">BASE_DIR</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DATA_PATH: </span><span class="si">{</span><span class="n">DATA_PATH</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;MAX_LEN  : </span><span class="si">{</span><span class="n">MAX_LEN</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;BATCH    : </span><span class="si">{</span><span class="n">BATCH_SIZE</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>BASE_DIR : /home/alejo/DeepLearning/miniproyecto3
+DATA_PATH: /home/alejo/DeepLearning/miniproyecto3/data/Resume.csv
+MAX_LEN  : 256
+BATCH    : 16
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="carga-de-artefactos-y-datos">
+<h2>2. Carga de artefactos y datos<a class="headerlink" href="#carga-de-artefactos-y-datos" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Label encoder (generado en notebook 01) ──────────────────────────────────</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;label_encoder.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">le</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">CLASS_NAMES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">le</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span>
+<span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">CLASS_NAMES</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Clases (</span><span class="si">{</span><span class="n">NUM_CLASSES</span><span class="si">}</span><span class="s1">): </span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># ── Etiquetas ya codificadas ─────────────────────────────────────────────────</span>
+<span class="n">y_train_saved</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_train.npy&#39;</span><span class="p">))</span>
+<span class="n">y_val_saved</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_val.npy&#39;</span><span class="p">))</span>
+<span class="n">y_test_saved</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_test.npy&#39;</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;y_train: </span><span class="si">{</span><span class="n">y_train_saved</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">  y_val: </span><span class="si">{</span><span class="n">y_val_saved</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">  y_test: </span><span class="si">{</span><span class="n">y_test_saved</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clases (24): [&#39;ACCOUNTANT&#39;, &#39;ADVOCATE&#39;, &#39;AGRICULTURE&#39;, &#39;APPAREL&#39;, &#39;ARTS&#39;, &#39;AUTOMOBILE&#39;, &#39;AVIATION&#39;, &#39;BANKING&#39;, &#39;BPO&#39;, &#39;BUSINESS-DEVELOPMENT&#39;, &#39;CHEF&#39;, &#39;CONSTRUCTION&#39;, &#39;CONSULTANT&#39;, &#39;DESIGNER&#39;, &#39;DIGITAL-MEDIA&#39;, &#39;ENGINEERING&#39;, &#39;FINANCE&#39;, &#39;FITNESS&#39;, &#39;HEALTHCARE&#39;, &#39;HR&#39;, &#39;INFORMATION-TECHNOLOGY&#39;, &#39;PUBLIC-RELATIONS&#39;, &#39;SALES&#39;, &#39;TEACHER&#39;]
+y_train: (1738,)  y_val: (373,)  y_test: (373,)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Reproducir split de texto crudo con misma semilla ────────────────────────</span>
+<span class="c1"># DistilBERT usa Resume_str crudo (NO clean_text).</span>
+<span class="c1"># Reproducimos los índices con random_state=42 para alinearnos con y_*.npy.</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dataset cargado: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">y_encoded</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Category&#39;</span><span class="p">])</span>
+<span class="n">idx_all</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+
+<span class="n">idx_train</span><span class="p">,</span> <span class="n">idx_temp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y_temp</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">idx_all</span><span class="p">,</span> <span class="n">y_encoded</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.30</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_encoded</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span>
+<span class="p">)</span>
+<span class="n">idx_val</span><span class="p">,</span> <span class="n">idx_test</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">idx_temp</span><span class="p">,</span> <span class="n">y_temp</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_temp</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span>
+<span class="p">)</span>
+
+<span class="c1"># Texto crudo (sin preprocesamiento — DistilBERT tiene su tokenizador propio)</span>
+<span class="n">text_train</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Resume_str&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx_train</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">text_val</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Resume_str&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx_val</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">text_test</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Resume_str&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx_test</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_encoded</span><span class="p">[</span><span class="n">idx_train</span><span class="p">]</span>
+<span class="n">y_val</span>   <span class="o">=</span> <span class="n">y_encoded</span><span class="p">[</span><span class="n">idx_val</span><span class="p">]</span>
+<span class="n">y_test</span>  <span class="o">=</span> <span class="n">y_encoded</span><span class="p">[</span><span class="n">idx_test</span><span class="p">]</span>
+
+<span class="c1"># Verificar consistencia con artefactos</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train_saved</span><span class="p">),</span> <span class="s1">&#39;ERROR: y_train no coincide con artefacto&#39;</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span>   <span class="n">y_val_saved</span><span class="p">),</span>   <span class="s1">&#39;ERROR: y_val no coincide con artefacto&#39;</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span>  <span class="n">y_test_saved</span><span class="p">),</span>  <span class="s1">&#39;ERROR: y_test no coincide con artefacto&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;✓ Split reproducido correctamente — etiquetas alineadas con artefactos&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  train: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text_train</span><span class="p">)</span><span class="si">}</span><span class="s1">  val: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text_val</span><span class="p">)</span><span class="si">}</span><span class="s1">  test: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset cargado: (2484, 4)
+✓ Split reproducido correctamente — etiquetas alineadas con artefactos
+  train: 1738  val: 373  test: 373
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="tokenizacion-con-distilbert-wordpiece">
+<h2>3. Tokenización con DistilBERT WordPiece<a class="headerlink" href="#tokenizacion-con-distilbert-wordpiece" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><p><strong>Nota sobre MAX_LEN=256:</strong> El EDA mostró una longitud media de 811 palabras (texto crudo). DistilBERT tiene un límite absoluto de 512 tokens WordPiece. MAX_LEN=256 trunca la mayoría de los currículos pero retiene el encabezado profesional — que suele concentrar las palabras clave de categoría. Es el balance entre cobertura semántica y costo computacional con 1738 muestras de entrenamiento.</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cargando tokenizador: </span><span class="si">{</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s1"> ...&#39;</span><span class="p">)</span>
+<span class="n">bert_tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">MODEL_NAME</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;✓ Tokenizador cargado&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">tokenize_batch</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">max_len</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tokeniza una lista de textos y retorna input_ids + attention_mask como numpy arrays.&quot;&quot;&quot;</span>
+    <span class="n">enc</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">texts</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="n">max_len</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;max_length&#39;</span><span class="p">,</span>
+        <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;np&#39;</span>       <span class="c1"># numpy — compatible con tf.data sin overhead</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">enc</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">enc</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tokenizando train ...&#39;</span><span class="p">)</span>
+<span class="n">X_train_ids</span><span class="p">,</span> <span class="n">X_train_mask</span> <span class="o">=</span> <span class="n">tokenize_batch</span><span class="p">(</span><span class="n">text_train</span><span class="p">,</span> <span class="n">bert_tokenizer</span><span class="p">,</span> <span class="n">MAX_LEN</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tokenizando val   ...&#39;</span><span class="p">)</span>
+<span class="n">X_val_ids</span><span class="p">,</span>   <span class="n">X_val_mask</span>   <span class="o">=</span> <span class="n">tokenize_batch</span><span class="p">(</span><span class="n">text_val</span><span class="p">,</span>   <span class="n">bert_tokenizer</span><span class="p">,</span> <span class="n">MAX_LEN</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tokenizando test  ...&#39;</span><span class="p">)</span>
+<span class="n">X_test_ids</span><span class="p">,</span>  <span class="n">X_test_mask</span>  <span class="o">=</span> <span class="n">tokenize_batch</span><span class="p">(</span><span class="n">text_test</span><span class="p">,</span>  <span class="n">bert_tokenizer</span><span class="p">,</span> <span class="n">MAX_LEN</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Shapes:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  X_train_ids : </span><span class="si">{</span><span class="n">X_train_ids</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">  X_train_mask : </span><span class="si">{</span><span class="n">X_train_mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  X_val_ids   : </span><span class="si">{</span><span class="n">X_val_ids</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">    X_val_mask   : </span><span class="si">{</span><span class="n">X_val_mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  X_test_ids  : </span><span class="si">{</span><span class="n">X_test_ids</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">   X_test_mask  : </span><span class="si">{</span><span class="n">X_test_mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cargando tokenizador: distilbert-base-uncased ...
+✓ Tokenizador cargado
+Tokenizando train ...
+Tokenizando val   ...
+Tokenizando test  ...
+
+Shapes:
+  X_train_ids : (1738, 256)  X_train_mask : (1738, 256)
+  X_val_ids   : (373, 256)    X_val_mask   : (373, 256)
+  X_test_ids  : (373, 256)   X_test_mask  : (373, 256)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="pipelines-tf-data-dataset">
+<h2>4. Pipelines <code class="docutils literal notranslate"><span class="pre">tf.data.Dataset</span></code><a class="headerlink" href="#pipelines-tf-data-dataset" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">make_dataset</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construye un tf.data.Dataset con dos inputs (input_ids, attention_mask) y etiquetas.&quot;&quot;&quot;</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">((</span>
+        <span class="p">{</span><span class="s1">&#39;input_ids&#39;</span><span class="p">:</span> <span class="n">ids</span><span class="p">,</span> <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span> <span class="n">mask</span><span class="p">},</span>
+        <span class="n">labels</span>
+    <span class="p">))</span>
+    <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">buffer_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AUTOTUNE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ds</span>
+
+<span class="n">ds_train</span> <span class="o">=</span> <span class="n">make_dataset</span><span class="p">(</span><span class="n">X_train_ids</span><span class="p">,</span> <span class="n">X_train_mask</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds_val</span>   <span class="o">=</span> <span class="n">make_dataset</span><span class="p">(</span><span class="n">X_val_ids</span><span class="p">,</span>   <span class="n">X_val_mask</span><span class="p">,</span>   <span class="n">y_val</span><span class="p">,</span>   <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ds_test</span>  <span class="o">=</span> <span class="n">make_dataset</span><span class="p">(</span><span class="n">X_test_ids</span><span class="p">,</span>  <span class="n">X_test_mask</span><span class="p">,</span>  <span class="n">y_test</span><span class="p">,</span>  <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ds_train batches: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ds_train</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ds_val   batches: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ds_val</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ds_test  batches: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ds_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Sanity check de shapes</span>
+<span class="k">for</span> <span class="n">x_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="ow">in</span> <span class="n">ds_train</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Batch shape — input_ids: </span><span class="si">{</span><span class="n">x_batch</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">  labels: </span><span class="si">{</span><span class="n">y_batch</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778990261.027822   10739 gpu_device.cc:2020] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 3536 MB memory:  -&gt; device: 0, name: NVIDIA GeForce RTX 4050 Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.9
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ds_train batches: 109
+ds_val   batches: 24
+ds_test  batches: 24
+
+Batch shape — input_ids: (16, 256)  labels: (16,)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-05-16 22:57:41.920007: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="arquitectura-del-modelo">
+<h2>5. Arquitectura del modelo<a class="headerlink" href="#arquitectura-del-modelo" title="Link to this heading">#</a></h2>
+<section id="decision-de-implementacion">
+<h3>Decisión de implementación<a class="headerlink" href="#decision-de-implementacion" title="Link to this heading">#</a></h3>
+<p>Se usa <strong><code class="docutils literal notranslate"><span class="pre">TFAutoModel</span></code> (backbone) + cabeza de clasificación Keras pura</strong> en lugar de <code class="docutils literal notranslate"><span class="pre">TFDistilBertForSequenceClassification</span></code>.<br />
+Razón: <code class="docutils literal notranslate"><span class="pre">TFDistilBertForSequenceClassification</span></code> presenta incompatibilidades con Keras 3.x (el API <code class="docutils literal notranslate"><span class="pre">call()</span></code> interno conflictúa con el grafo de Keras 3 en TF 2.20), produciendo errores de compilación en <code class="docutils literal notranslate"><span class="pre">model.fit()</span></code>. El patrón backbone + cabeza custom es equivalente en capacidad, más estable, y totalmente compatible con la Functional API de Keras 3.</p>
+</section>
+<section id="estrategia-de-fine-tuning">
+<h3>Estrategia de fine-tuning<a class="headerlink" href="#estrategia-de-fine-tuning" title="Link to this heading">#</a></h3>
+<p>Se entrena el <strong>backbone completo</strong> (full fine-tuning) junto con la cabeza desde el inicio.<br />
+Justificación: con solo 1738 muestras, el fine-tuning completo con learning rate bajo (2e-5) y warmup es estándar — los pesos preentrenados proveen regularización implícita.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">hf_hub_download</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFDistilBertModel</span><span class="p">,</span> <span class="n">DistilBertConfig</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Descargando config y pesos TF nativos...&#39;</span><span class="p">)</span>
+
+<span class="c1"># Descargar tf_model.h5 directamente — evita la conversión PyTorch→TF que falla</span>
+<span class="n">weights_path</span> <span class="o">=</span> <span class="n">hf_hub_download</span><span class="p">(</span>
+    <span class="n">repo_id</span><span class="o">=</span><span class="s1">&#39;distilbert-base-uncased&#39;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;tf_model.h5&#39;</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pesos descargados en: </span><span class="si">{</span><span class="n">weights_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Construir modelo desde config y cargar pesos directamente</span>
+<span class="n">config</span>   <span class="o">=</span> <span class="n">DistilBertConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;distilbert-base-uncased&#39;</span><span class="p">)</span>
+<span class="n">backbone</span> <span class="o">=</span> <span class="n">TFDistilBertModel</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Llamada dummy para inicializar pesos antes de cargar</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">dummy_ids</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="n">dummy_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>  <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">backbone</span><span class="p">(</span><span class="n">dummy_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">dummy_mask</span><span class="p">)</span>
+
+<span class="c1"># Cargar pesos .h5 directamente — sin pasar por transformers</span>
+<span class="n">backbone</span><span class="o">.</span><span class="n">load_weights</span><span class="p">(</span><span class="n">weights_path</span><span class="p">,</span> <span class="n">by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_mismatch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;✓ Backbone cargado con pesos preentrenados&#39;</span><span class="p">)</span>
+
+<span class="c1"># ── Functional API ───────────────────────────────────────────────────────────</span>
+<span class="n">input_ids</span>      <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">MAX_LEN</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_ids&#39;</span><span class="p">)</span>
+<span class="n">attention_mask</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">MAX_LEN</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">)</span>
+
+<span class="c1"># Backbone — training=False en inferencia para desactivar dropout interno</span>
+<span class="n">bert_outputs</span> <span class="o">=</span> <span class="n">backbone</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span>
+    <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">,</span>
+    <span class="n">training</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="c1"># Token [CLS] (posición 0) — representación global de la secuencia</span>
+<span class="n">cls_output</span> <span class="o">=</span> <span class="n">bert_outputs</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>   <span class="c1"># (batch, 768)</span>
+
+<span class="c1"># Cabeza de clasificación</span>
+<span class="n">x</span>   <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)(</span><span class="n">cls_output</span><span class="p">)</span>
+<span class="n">x</span>   <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dense_1&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span>   <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">],</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;DistilBERT_Classifier&#39;</span>
+<span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Descargando config y pesos TF nativos...
+Pesos descargados en: /home/alejo/.cache/huggingface/hub/models--distilbert-base-uncased/snapshots/12040accade4e8a0f71eabdb258fecc2e7e948be/tf_model.h5
+✓ Backbone cargado con pesos preentrenados
+Model: &quot;DistilBERT_Classifier&quot;
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input_ids (InputLayer)      [(None, 256)]                0         []                            
+                                                                                                  
+ attention_mask (InputLayer  [(None, 256)]                0         []                            
+ )                                                                                                
+                                                                                                  
+ tf_distil_bert_model_1 (TF  TFBaseModelOutput(last_hid   6636288   [&#39;input_ids[0][0]&#39;,           
+ DistilBertModel)            den_state=(None, 256, 768)   0          &#39;attention_mask[0][0]&#39;]      
+                             , hidden_states=None, atte                                           
+                             ntions=None)                                                         
+                                                                                                  
+ tf.__operators__.getitem (  (None, 768)                  0         [&#39;tf_distil_bert_model_1[0][0]
+ SlicingOpLambda)                                                   &#39;]                            
+                                                                                                  
+ dropout_38 (Dropout)        (None, 768)                  0         [&#39;tf.__operators__.getitem[0][
+                                                                    0]&#39;]                          
+                                                                                                  
+ dense_1 (Dense)             (None, 256)                  196864    [&#39;dropout_38[0][0]&#39;]          
+                                                                                                  
+ dropout_39 (Dropout)        (None, 256)                  0         [&#39;dense_1[0][0]&#39;]             
+                                                                                                  
+ output (Dense)              (None, 24)                   6168      [&#39;dropout_39[0][0]&#39;]          
+                                                                                                  
+==================================================================================================
+Total params: 66565912 (253.93 MB)
+Trainable params: 66565912 (253.93 MB)
+Non-trainable params: 0 (0.00 Byte)
+__________________________________________________________________________________________________
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="optimizer-con-linear-warmup">
+<h2>6. Optimizer con linear warmup<a class="headerlink" href="#optimizer-con-linear-warmup" title="Link to this heading">#</a></h2>
+<p>El learning rate sube linealmente desde 0 hasta <code class="docutils literal notranslate"><span class="pre">LR</span></code> durante los primeros <code class="docutils literal notranslate"><span class="pre">warmup_steps</span></code>, luego decae linealmente a 0. Esto es el schedule estándar para fine-tuning de Transformers — estabiliza el entrenamiento en las primeras épocas cuando los pesos de la cabeza están sin inicializar.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span> <span class="o">/</span> <span class="n">BATCH_SIZE</span><span class="p">)</span>
+<span class="n">total_steps</span>     <span class="o">=</span> <span class="n">steps_per_epoch</span> <span class="o">*</span> <span class="n">EPOCHS</span>
+<span class="n">warmup_steps</span>    <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_steps</span> <span class="o">*</span> <span class="n">WARMUP_RATIO</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;steps_per_epoch : </span><span class="si">{</span><span class="n">steps_per_epoch</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;total_steps     : </span><span class="si">{</span><span class="n">total_steps</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;warmup_steps    : </span><span class="si">{</span><span class="n">warmup_steps</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LinearWarmupSchedule</span><span class="p">(</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">schedules</span><span class="o">.</span><span class="n">LearningRateSchedule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sube linealmente hasta peak_lr en warmup_steps, luego decae linealmente a 0.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peak_lr</span><span class="p">,</span> <span class="n">warmup_steps</span><span class="p">,</span> <span class="n">total_steps</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peak_lr</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">peak_lr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">warmup_steps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_steps</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">warmup_lr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_lr</span> <span class="o">*</span> <span class="p">(</span><span class="n">step</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">decay_lr</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_lr</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+            <span class="mf">0.0</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">-</span> <span class="n">step</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">step</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">,</span> <span class="n">warmup_lr</span><span class="p">,</span> <span class="n">decay_lr</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;peak_lr&#39;</span>     <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_lr</span><span class="p">,</span>
+            <span class="s1">&#39;warmup_steps&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup_steps</span><span class="p">,</span>
+            <span class="s1">&#39;total_steps&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span>
+        <span class="p">}</span>
+
+<span class="n">lr_schedule</span> <span class="o">=</span> <span class="n">LinearWarmupSchedule</span><span class="p">(</span>
+    <span class="n">peak_lr</span><span class="o">=</span><span class="n">LR</span><span class="p">,</span>
+    <span class="n">warmup_steps</span><span class="o">=</span><span class="n">warmup_steps</span><span class="p">,</span>
+    <span class="n">total_steps</span><span class="o">=</span><span class="n">total_steps</span>
+<span class="p">)</span>
+
+<span class="c1"># Visualizar el schedule</span>
+<span class="n">lrs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">lr_schedule</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_steps</span><span class="p">)]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lrs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">warmup_steps</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Fin warmup (step </span><span class="si">{</span><span class="n">warmup_steps</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Step&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Learning Rate&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Linear Warmup + Linear Decay Schedule&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>steps_per_epoch : 109
+total_steps     : 1090
+warmup_steps    : 109
+</pre></div>
+</div>
+<img alt="../../_images/abb63fc2454b139995380acc7d181ac3d7f2c897f03b6d2578628bf343ce311f.png" src="../../_images/abb63fc2454b139995380acc7d181ac3d7f2c897f03b6d2578628bf343ce311f.png" />
+</div>
+</div>
+</section>
+<section id="compilacion-y-callbacks">
+<h2>7. Compilación y callbacks<a class="headerlink" href="#compilacion-y-callbacks" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">lr_schedule</span><span class="p">,</span> <span class="n">clipnorm</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;sparse_categorical_crossentropy&#39;</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">MODEL_SAVE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span> <span class="s1">&#39;distilbert_classifier.keras&#39;</span><span class="p">)</span>
+
+<span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">EarlyStopping</span><span class="p">(</span>
+        <span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span>
+        <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>              <span class="c1"># paciencia reducida — fine-tuning converge rápido</span>
+        <span class="n">restore_best_weights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">),</span>
+    <span class="n">ModelCheckpoint</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">MODEL_SAVE_PATH</span><span class="p">,</span>
+        <span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span>
+        <span class="n">save_best_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="c1"># Nota: ReduceLROnPlateau NO se usa aquí porque ya tenemos un schedule</span>
+    <span class="c1"># explícito. Combinarlo causaría conflicto entre el decay del schedule</span>
+    <span class="c1"># y el factor del plateau.</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;✓ Modelo compilado&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Parámetros totales    : </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">count_params</span><span class="p">()</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Guardar mejor en      : </span><span class="si">{</span><span class="n">MODEL_SAVE_PATH</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓ Modelo compilado
+  Parámetros totales    : 66,565,912
+  Guardar mejor en      : /home/alejo/DeepLearning/miniproyecto3/models/distilbert_classifier.keras
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="entrenamiento">
+<h2>8. Entrenamiento<a class="headerlink" href="#entrenamiento" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Iniciando entrenamiento...&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Epochs máx : </span><span class="si">{</span><span class="n">EPOCHS</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Batch size : </span><span class="si">{</span><span class="n">BATCH_SIZE</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  MAX_LEN    : </span><span class="si">{</span><span class="n">MAX_LEN</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">ds_train</span><span class="p">,</span>
+    <span class="n">validation_data</span><span class="o">=</span><span class="n">ds_val</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="n">EPOCHS</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+
+<span class="n">training_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Entrenamiento finalizado en </span><span class="si">{</span><span class="n">training_time</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">s (</span><span class="si">{</span><span class="n">training_time</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> min)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iniciando entrenamiento...
+  Epochs máx : 10
+  Batch size : 16
+  MAX_LEN    : 256
+--------------------------------------------------
+Epoch 1/10
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-05-16 23:00:37.580987: I external/local_xla/xla/service/service.cc:163] XLA service 0x740c144c6e20 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2026-05-16 23:00:37.581034: I external/local_xla/xla/service/service.cc:171]   StreamExecutor device (0): NVIDIA GeForce RTX 4050 Laptop GPU, Compute Capability 8.9
+2026-05-16 23:00:37.602984: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+2026-05-16 23:00:37.650881: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:473] Loaded cuDNN version 91801
+I0000 00:00:1778990437.744692   10822 device_compiler.h:196] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>109/109 [==============================] - ETA: 0s - loss: 3.1924 - accuracy: 0.0639
+Epoch 1: val_loss improved from inf to 2.85399, saving model to /home/alejo/DeepLearning/miniproyecto3/models/distilbert_classifier.keras
+109/109 [==============================] - 57s 376ms/step - loss: 3.1924 - accuracy: 0.0639 - val_loss: 2.8540 - val_accuracy: 0.2949
+Epoch 2/10
+109/109 [==============================] - ETA: 0s - loss: 1.8504 - accuracy: 0.5311
+Epoch 2: val_loss improved from 2.85399 to 1.00344, saving model to /home/alejo/DeepLearning/miniproyecto3/models/distilbert_classifier.keras
+109/109 [==============================] - 41s 373ms/step - loss: 1.8504 - accuracy: 0.5311 - val_loss: 1.0034 - val_accuracy: 0.7641
+Epoch 3/10
+109/109 [==============================] - ETA: 0s - loss: 0.8719 - accuracy: 0.7940
+Epoch 3: val_loss improved from 1.00344 to 0.86770, saving model to /home/alejo/DeepLearning/miniproyecto3/models/distilbert_classifier.keras
+109/109 [==============================] - 40s 369ms/step - loss: 0.8719 - accuracy: 0.7940 - val_loss: 0.8677 - val_accuracy: 0.7748
+Epoch 4/10
+109/109 [==============================] - ETA: 0s - loss: 0.6332 - accuracy: 0.8487
+Epoch 4: val_loss improved from 0.86770 to 0.86440, saving model to /home/alejo/DeepLearning/miniproyecto3/models/distilbert_classifier.keras
+109/109 [==============================] - 43s 391ms/step - loss: 0.6332 - accuracy: 0.8487 - val_loss: 0.8644 - val_accuracy: 0.7882
+Epoch 5/10
+109/109 [==============================] - ETA: 0s - loss: 0.4632 - accuracy: 0.8820
+Epoch 5: val_loss improved from 0.86440 to 0.81013, saving model to /home/alejo/DeepLearning/miniproyecto3/models/distilbert_classifier.keras
+109/109 [==============================] - 41s 371ms/step - loss: 0.4632 - accuracy: 0.8820 - val_loss: 0.8101 - val_accuracy: 0.8016
+Epoch 6/10
+109/109 [==============================] - ETA: 0s - loss: 0.3384 - accuracy: 0.9148
+Epoch 6: val_loss did not improve from 0.81013
+109/109 [==============================] - 37s 340ms/step - loss: 0.3384 - accuracy: 0.9148 - val_loss: 0.8467 - val_accuracy: 0.7828
+Epoch 7/10
+109/109 [==============================] - ETA: 0s - loss: 0.2351 - accuracy: 0.9430
+Epoch 7: val_loss did not improve from 0.81013
+109/109 [==============================] - 37s 337ms/step - loss: 0.2351 - accuracy: 0.9430 - val_loss: 0.8547 - val_accuracy: 0.7882
+Epoch 8/10
+109/109 [==============================] - ETA: 0s - loss: 0.1837 - accuracy: 0.9597
+Epoch 8: val_loss did not improve from 0.81013
+109/109 [==============================] - 37s 339ms/step - loss: 0.1837 - accuracy: 0.9597 - val_loss: 0.8715 - val_accuracy: 0.7909
+Epoch 8: early stopping
+Restoring model weights from the end of the best epoch: 5.
+
+Entrenamiento finalizado en 333.1s (5.6 min)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="curvas-de-entrenamiento">
+<h2>9. Curvas de entrenamiento<a class="headerlink" href="#curvas-de-entrenamiento" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hist</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">history</span>
+<span class="n">epochs_run</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Loss</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs_run</span><span class="p">,</span> <span class="n">hist</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">],</span>     <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train loss&#39;</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs_run</span><span class="p">,</span> <span class="n">hist</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val loss&#39;</span><span class="p">,</span>    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tomato&#39;</span><span class="p">,</span>    <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Loss por época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Accuracy</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs_run</span><span class="p">,</span> <span class="n">hist</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">],</span>     <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train acc&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs_run</span><span class="p">,</span> <span class="n">hist</span><span class="p">[</span><span class="s1">&#39;val_accuracy&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val acc&#39;</span><span class="p">,</span>   <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tomato&#39;</span><span class="p">,</span>    <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Accuracy por época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;DistilBERT — Curvas de entrenamiento&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">best_epoch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">hist</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">]))</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mejor época (menor val_loss): </span><span class="si">{</span><span class="n">best_epoch</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  val_loss     : </span><span class="si">{</span><span class="n">hist</span><span class="p">[</span><span class="s2">&quot;val_loss&quot;</span><span class="p">][</span><span class="n">best_epoch</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  val_accuracy : </span><span class="si">{</span><span class="n">hist</span><span class="p">[</span><span class="s2">&quot;val_accuracy&quot;</span><span class="p">][</span><span class="n">best_epoch</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/5548c7fd707617cad8cce5e09ae06d7e2d035b8825af329474d6186a7fd5255b.png" src="../../_images/5548c7fd707617cad8cce5e09ae06d7e2d035b8825af329474d6186a7fd5255b.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mejor época (menor val_loss): 5
+  val_loss     : 0.8101
+  val_accuracy : 0.8016
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="predicciones-en-test">
+<h2>10. Predicciones en test<a class="headerlink" href="#predicciones-en-test" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Generando predicciones en test...&#39;</span><span class="p">)</span>
+<span class="n">y_proba_test</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds_test</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># (N, NUM_CLASSES)</span>
+<span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_proba_test</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;y_proba_test shape : </span><span class="si">{</span><span class="n">y_proba_test</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;y_pred_test  shape : </span><span class="si">{</span><span class="n">y_pred_test</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Verificar que las probabilidades sumen ~1.0</span>
+<span class="n">row_sums</span> <span class="o">=</span> <span class="n">y_proba_test</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Suma de probs por fila — min: </span><span class="si">{</span><span class="n">row_sums</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">  max: </span><span class="si">{</span><span class="n">row_sums</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generando predicciones en test...
+24/24 [==============================] - 3s 103ms/step
+y_proba_test shape : (373, 24)
+y_pred_test  shape : (373,)
+Suma de probs por fila — min: 1.000000  max: 1.000000
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="metricas-de-evaluacion">
+<h2>11. Métricas de evaluación<a class="headerlink" href="#metricas-de-evaluacion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">acc</span>       <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">)</span>
+<span class="n">prec_w</span>    <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rec_w</span>     <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">f1_w</span>      <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">roc_auc_w</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_proba_test</span><span class="p">,</span> <span class="n">multi_class</span><span class="o">=</span><span class="s1">&#39;ovr&#39;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">)</span>
+<span class="n">roc_auc_m</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_proba_test</span><span class="p">,</span> <span class="n">multi_class</span><span class="o">=</span><span class="s1">&#39;ovr&#39;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;micro&#39;</span><span class="p">)</span>
+
+<span class="c1"># Mean Average Precision</span>
+<span class="n">y_test_bin</span> <span class="o">=</span> <span class="n">label_binarize</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">))</span>
+<span class="n">map_score</span>  <span class="o">=</span> <span class="n">average_precision_score</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">,</span> <span class="n">y_proba_test</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">55</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MÉTRICAS FINALES — DistilBERT (test set)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">55</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Accuracy              : </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Precision (weighted)  : </span><span class="si">{</span><span class="n">prec_w</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Recall (weighted)     : </span><span class="si">{</span><span class="n">rec_w</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  F1 (weighted)         : </span><span class="si">{</span><span class="n">f1_w</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  ROC-AUC (OvR weighted): </span><span class="si">{</span><span class="n">roc_auc_w</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  ROC-AUC (micro)       : </span><span class="si">{</span><span class="n">roc_auc_m</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  MAP (weighted)        : </span><span class="si">{</span><span class="n">map_score</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">55</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=======================================================
+MÉTRICAS FINALES — DistilBERT (test set)
+=======================================================
+  Accuracy              : 0.8016
+  Precision (weighted)  : 0.7850
+  Recall (weighted)     : 0.8016
+  F1 (weighted)         : 0.7899
+  ROC-AUC (OvR weighted): 0.9746
+  ROC-AUC (micro)       : 0.9806
+  MAP (weighted)        : 0.8602
+=======================================================
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Classification Report:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span>
+    <span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">,</span>
+    <span class="n">target_names</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Classification Report:
+                        precision    recall  f1-score   support
+
+            ACCOUNTANT       1.00      1.00      1.00        17
+              ADVOCATE       0.88      0.82      0.85        17
+           AGRICULTURE       0.56      0.50      0.53        10
+               APPAREL       0.70      0.50      0.58        14
+                  ARTS       0.50      0.38      0.43        16
+            AUTOMOBILE       0.00      0.00      0.00         5
+              AVIATION       0.75      0.83      0.79        18
+               BANKING       0.80      0.67      0.73        18
+                   BPO       0.00      0.00      0.00         4
+  BUSINESS-DEVELOPMENT       0.85      0.94      0.89        18
+                  CHEF       0.93      0.76      0.84        17
+          CONSTRUCTION       1.00      1.00      1.00        17
+            CONSULTANT       0.89      0.94      0.92        18
+              DESIGNER       0.94      1.00      0.97        16
+         DIGITAL-MEDIA       0.65      0.73      0.69        15
+           ENGINEERING       0.89      0.94      0.91        17
+               FINANCE       0.90      1.00      0.95        18
+               FITNESS       0.58      0.65      0.61        17
+            HEALTHCARE       0.55      0.67      0.60        18
+                    HR       1.00      1.00      1.00        16
+INFORMATION-TECHNOLOGY       0.70      0.89      0.78        18
+      PUBLIC-RELATIONS       0.69      0.69      0.69        16
+                 SALES       0.94      0.94      0.94        17
+               TEACHER       0.89      1.00      0.94        16
+
+              accuracy                           0.80       373
+             macro avg       0.73      0.74      0.73       373
+          weighted avg       0.78      0.80      0.79       373
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="matrices-de-confusion">
+<h2>12. Matrices de confusión<a class="headerlink" href="#matrices-de-confusion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cm</span>      <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">)</span>
+<span class="n">cm_norm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">cell_size</span> <span class="o">=</span> <span class="mf">0.75</span>
+<span class="n">fig_side</span>  <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">NUM_CLASSES</span> <span class="o">*</span> <span class="n">cell_size</span><span class="p">)</span>
+
+<span class="c1"># ── Figura 1: conteos absolutos ──────────────────────────────────────────────</span>
+<span class="n">fig1</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">fig_side</span><span class="p">,</span> <span class="n">fig_side</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s1">&#39;lightgray&#39;</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;shrink&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Matriz de Confusión — DistilBERT (conteos absolutos)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicho&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># ── Figura 2: normalizada por filas ─────────────────────────────────────────</span>
+<span class="n">fig2</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">fig_side</span><span class="p">,</span> <span class="n">fig_side</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm_norm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greens&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s1">&#39;lightgray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;shrink&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Matriz de Confusión — DistilBERT (normalizada por fila)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicho&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/ffba8621a13818bc95d1fc48f2bc065215cb83ee933b4395ca6195432fde14d0.png" src="../../_images/ffba8621a13818bc95d1fc48f2bc065215cb83ee933b4395ca6195432fde14d0.png" />
+<img alt="../../_images/c8c1b616959996cebef741fa892774ba302704994a6c5d0407c2440940c8885d.png" src="../../_images/c8c1b616959996cebef741fa892774ba302704994a6c5d0407c2440940c8885d.png" />
+</div>
+</div>
+</section>
+<section id="curvas-roc-por-clase">
+<h2>13. Curvas ROC por clase<a class="headerlink" href="#curvas-roc-por-clase" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calcular ROC y PR por clase</span>
+<span class="n">fpr_dict</span>     <span class="o">=</span> <span class="p">{}</span>
+<span class="n">tpr_dict</span>     <span class="o">=</span> <span class="p">{}</span>
+<span class="n">roc_auc_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">prec_dict</span>    <span class="o">=</span> <span class="p">{}</span>
+<span class="n">rec_dict</span>     <span class="o">=</span> <span class="p">{}</span>
+<span class="n">pr_auc_dict</span>  <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">class_prevalence</span> <span class="o">=</span> <span class="n">y_test_bin</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_proba_test</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_proba_test</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="c1"># ── Subplots ROC ─────────────────────────────────────────────────────────────</span>
+<span class="n">n_cols</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">n_rows</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">NUM_CLASSES</span> <span class="o">/</span> <span class="n">n_cols</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">AUC=</span><span class="si">{</span><span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;FPR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;TPR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="c1"># Ocultar subplots vacíos</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="n">n_cols</span><span class="p">):</span>
+    <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas ROC por clase — DistilBERT&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/94ad307d17448877ab0bb99901c5836fec4edff684a21e9a9bf49af1966f6122.png" src="../../_images/94ad307d17448877ab0bb99901c5836fec4edff684a21e9a9bf49af1966f6122.png" />
+</div>
+</div>
+</section>
+<section id="curvas-precision-recall-por-clase">
+<h2>14. Curvas Precision-Recall por clase<a class="headerlink" href="#curvas-precision-recall-por-clase" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">class_prevalence</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+               <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Baseline=</span><span class="si">{</span><span class="n">class_prevalence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">AP=</span><span class="si">{</span><span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Recall&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Precision&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="n">n_cols</span><span class="p">):</span>
+    <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas Precision-Recall por clase — DistilBERT&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/bc17687a45fa8b4ca07d6b24fcc9131a5906db76d9eff4328cee8b4007d2fd62.png" src="../../_images/bc17687a45fa8b4ca07d6b24fcc9131a5906db76d9eff4328cee8b4007d2fd62.png" />
+</div>
+</div>
+</section>
+<section id="guardado-de-metricas">
+<h2>15. Guardado de métricas<a class="headerlink" href="#guardado-de-metricas" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Per-class metrics</span>
+<span class="n">per_class</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">report</span>    <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+                                  <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">output_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">CLASS_NAMES</span><span class="p">):</span>
+    <span class="n">per_class</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="s1">&#39;precision&#39;</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;recall&#39;</span>   <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="s1">&#39;recall&#39;</span><span class="p">],</span>    <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;f1&#39;</span>       <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="s1">&#39;f1-score&#39;</span><span class="p">],</span>  <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;support&#39;</span>  <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="s1">&#39;support&#39;</span><span class="p">]),</span>
+        <span class="s1">&#39;roc_auc&#39;</span>  <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>  <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;pr_auc&#39;</span>   <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>   <span class="mi">4</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;model_name&#39;</span>            <span class="p">:</span> <span class="s1">&#39;DistilBERT fine-tuned&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;timestamp&#39;</span>             <span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="s1">&#39;hyperparameters&#39;</span>       <span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;backbone&#39;</span>          <span class="p">:</span> <span class="n">MODEL_NAME</span><span class="p">,</span>
+        <span class="s1">&#39;max_len&#39;</span>           <span class="p">:</span> <span class="n">MAX_LEN</span><span class="p">,</span>
+        <span class="s1">&#39;batch_size&#39;</span>        <span class="p">:</span> <span class="n">BATCH_SIZE</span><span class="p">,</span>
+        <span class="s1">&#39;epochs_max&#39;</span>        <span class="p">:</span> <span class="n">EPOCHS</span><span class="p">,</span>
+        <span class="s1">&#39;epochs_run&#39;</span>        <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]),</span>
+        <span class="s1">&#39;best_epoch&#39;</span>        <span class="p">:</span> <span class="n">best_epoch</span><span class="p">,</span>
+        <span class="s1">&#39;learning_rate_peak&#39;</span><span class="p">:</span> <span class="n">LR</span><span class="p">,</span>
+        <span class="s1">&#39;warmup_ratio&#39;</span>      <span class="p">:</span> <span class="n">WARMUP_RATIO</span><span class="p">,</span>
+        <span class="s1">&#39;warmup_steps&#39;</span>      <span class="p">:</span> <span class="n">warmup_steps</span><span class="p">,</span>
+        <span class="s1">&#39;total_steps&#39;</span>       <span class="p">:</span> <span class="n">total_steps</span><span class="p">,</span>
+        <span class="s1">&#39;optimizer&#39;</span>         <span class="p">:</span> <span class="s1">&#39;Adam + LinearWarmup&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;clipnorm&#39;</span>          <span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s1">&#39;fine_tuning&#39;</span>       <span class="p">:</span> <span class="s1">&#39;full&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;head_dropout&#39;</span>      <span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+        <span class="s1">&#39;head_dense_units&#39;</span>  <span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;metrics&#39;</span>               <span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;accuracy&#39;</span>              <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">acc</span><span class="p">),</span>       <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;precision_weighted&#39;</span>    <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">prec_w</span><span class="p">),</span>    <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;recall_weighted&#39;</span>       <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">rec_w</span><span class="p">),</span>     <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;f1_weighted&#39;</span>           <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f1_w</span><span class="p">),</span>      <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;roc_auc_ovr_weighted&#39;</span>  <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_w</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;roc_auc_micro&#39;</span>         <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_m</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="s1">&#39;mean_average_precision&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">map_score</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;per_class&#39;</span>             <span class="p">:</span> <span class="n">per_class</span><span class="p">,</span>
+    <span class="s1">&#39;training_time_seconds&#39;</span> <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">training_time</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s1">&#39;data_sizes&#39;</span>            <span class="p">:</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">),</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">),</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)},</span>
+<span class="p">}</span>
+
+<span class="n">metrics_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">METRICS_DIR</span><span class="p">,</span> <span class="s1">&#39;distilbert_metrics.json&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metrics_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metrics_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;✓ Métricas guardadas en: </span><span class="si">{</span><span class="n">metrics_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Resumen:&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics_dict</span><span class="p">[</span><span class="s1">&#39;metrics&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">k</span><span class="si">:</span><span class="s1">&lt;30</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✓ Métricas guardadas en: /home/alejo/DeepLearning/miniproyecto3/artifacts/metrics/distilbert_metrics.json
+
+Resumen:
+  accuracy                      : 0.8016
+  precision_weighted            : 0.785
+  recall_weighted               : 0.8016
+  f1_weighted                   : 0.7899
+  roc_auc_ovr_weighted          : 0.9746
+  roc_auc_micro                 : 0.9806
+  mean_average_precision        : 0.8602
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/nlp"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="05_Model_FastText.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">05 — Modelo FastText</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="07_Comparacion_Modelos.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">07 — Comparación de Modelos y Análisis Crítico</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-y-configuracion">0. Imports y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas-y-constantes">1. Rutas y constantes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-artefactos-y-datos">2. Carga de artefactos y datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tokenizacion-con-distilbert-wordpiece">3. Tokenización con DistilBERT WordPiece</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipelines-tf-data-dataset">4. Pipelines <code class="docutils literal notranslate"><span class="pre">tf.data.Dataset</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arquitectura-del-modelo">5. Arquitectura del modelo</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-de-implementacion">Decisión de implementación</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estrategia-de-fine-tuning">Estrategia de fine-tuning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimizer-con-linear-warmup">6. Optimizer con linear warmup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilacion-y-callbacks">7. Compilación y callbacks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento">8. Entrenamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-de-entrenamiento">9. Curvas de entrenamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#predicciones-en-test">10. Predicciones en test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-de-evaluacion">11. Métricas de evaluación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-confusion">12. Matrices de confusión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-roc-por-clase">13. Curvas ROC por clase</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-precision-recall-por-clase">14. Curvas Precision-Recall por clase</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardado-de-metricas">15. Guardado de métricas</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mateo Gomez, Mateo Molinares, David Ibañez y Alejandro Moya
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

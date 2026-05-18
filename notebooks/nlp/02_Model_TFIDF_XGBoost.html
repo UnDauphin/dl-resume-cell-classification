@@ -1,0 +1,1755 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>02 — Modelo Baseline: TF-IDF + XGBoost &#8212; Deep Learning: Segmentación de Células e Interpretación de Texto</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/nlp/02_Model_TFIDF_XGBoost';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="03 — CNN-1D para Clasificación de Texto" href="03_Model_CNN1D.html" />
+    <link rel="prev" title="Bloque 2 - NLP: EDA y Preprocesamiento" href="01_EDA_NLP_Resume.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Deep Learning: Segmentación de Células e Interpretación de Texto
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 1 — Segmentación de Imágenes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../vision/01_EDA.html">Analisis Exploratorio de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/02_preprocesamiento_sartorius.html">Preprocesamiento para Modelado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/03_modelado_sartorius_cellpose.html">Modelado — Sartorius Cell Instance Segmentation-Cellpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/04_modelado_sartorius_OPTIMIZADO.html">04 — Modelado Sartorius · OPTIMIZADO para Colab Pro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/05_hover-net.html">Modelado — HoVer-Net</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/06_mask_rcnn.html">Modelado — Mask R-CNN con Swin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/07_evaluacion_final.html">Evaluación Final — Sartorius Cell Instance Segmentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 2 — NLP</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_EDA_NLP_Resume.html">Bloque 2 - NLP: EDA y Preprocesamiento</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">02 — Modelo Baseline: TF-IDF + XGBoost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Model_CNN1D.html">03 — CNN-1D para Clasificación de Texto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Model_BiLSTM.html">04 — Word2Vec + BiLSTM con Keras Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Model_FastText.html">05 — Modelo FastText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Model_DistilBERT.html">06 — DistilBERT Fine-tuning para Clasificación de Currículos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Comparacion_Modelos.html">07 — Comparación de Modelos y Análisis Crítico</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/nlp/02_Model_TFIDF_XGBoost.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>02 — Modelo Baseline: TF-IDF + XGBoost</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#descripcion">Descripción</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-y-configuracion">1. Imports y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas-y-directorios">2. Rutas y directorios</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-datos-y-artefactos-del-eda">3. Carga de datos y artefactos del EDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vectorizacion-tf-idf">4. Vectorización TF-IDF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-del-desbalance-de-clases">5. Manejo del desbalance de clases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento-xgboost">6. Entrenamiento XGBoost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-de-entrenamiento">7. Curvas de entrenamiento</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nota-sobre-el-overfitting-observado">Nota sobre el overfitting observado</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluacion-sobre-test">8. Evaluación sobre Test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizaciones-de-evaluacion">9. Visualizaciones de evaluación</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-confusion">9.1 Matriz de confusión</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-roc-one-vs-rest-por-clase">9.2 Curva ROC — One-vs-Rest por clase</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-precision-recall-one-vs-rest-por-clase">9.3 Curva Precision-Recall — One-vs-Rest por clase</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#f1-por-clase-barplot-comparativo">9.4 F1 por clase — barplot comparativo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#importancia-de-features-top-terminos-tf-idf">9.5 Importancia de features (Top términos TF-IDF)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardar-modelo-y-metricas">10. Guardar modelo y métricas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resumen-del-modelo">11. Resumen del modelo</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="modelo-baseline-tf-idf-xgboost">
+<h1>02 — Modelo Baseline: TF-IDF + XGBoost<a class="headerlink" href="#modelo-baseline-tf-idf-xgboost" title="Link to this heading">#</a></h1>
+<p><strong>Proyecto:</strong> Segmentación de células e interpretación de texto mediante modelos de deep learning<br />
+<strong>Autor:</strong> Dr. Lihki Rubio<br />
+<strong>Notebook:</strong> 02 de 06 — Modelo clásico de referencia</p>
+<hr class="docutils" />
+<section id="descripcion">
+<h2>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading">#</a></h2>
+<p>Este notebook implementa el modelo baseline <strong>TF-IDF + XGBoost</strong> para clasificación de currículos en 24 categorías profesionales.</p>
+<p><strong>Pipeline:</strong></p>
+<ul class="simple">
+<li><p>Carga de <code class="docutils literal notranslate"><span class="pre">clean_text</span></code> desde <code class="docutils literal notranslate"><span class="pre">data/Resume.csv</span></code> + splits desde <code class="docutils literal notranslate"><span class="pre">artifacts/</span></code></p></li>
+<li><p>Vectorización TF-IDF sobre texto completo (sin truncado de secuencia)</p></li>
+<li><p>Clasificación con XGBoost (acelerado por GPU/CUDA si disponible)</p></li>
+<li><p>Evaluación completa: Accuracy, Precision, Recall, F1-weighted, ROC-AUC</p></li>
+<li><p>Visualizaciones: Matriz de confusión, Curva ROC, Curva Precision-Recall</p></li>
+<li><p>Persistencia de métricas en <code class="docutils literal notranslate"><span class="pre">artifacts/metrics/tfidf_xgboost.json</span></code></p></li>
+</ul>
+<p><strong>Nota:</strong> TF-IDF usa <code class="docutils literal notranslate"><span class="pre">clean_text</span></code> completo — no los arrays padded del EDA. XGBoost no requiere secuencias de longitud fija.</p>
+</section>
+<hr class="docutils" />
+<section id="imports-y-configuracion">
+<h2>1. Imports y configuración<a class="headerlink" href="#imports-y-configuracion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.feature_extraction.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">label_binarize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_sample_weight</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accuracy_score</span><span class="p">,</span>
+    <span class="n">precision_score</span><span class="p">,</span>
+    <span class="n">recall_score</span><span class="p">,</span>
+    <span class="n">f1_score</span><span class="p">,</span>
+    <span class="n">roc_auc_score</span><span class="p">,</span>
+    <span class="n">confusion_matrix</span><span class="p">,</span>
+    <span class="n">classification_report</span><span class="p">,</span>
+    <span class="n">roc_curve</span><span class="p">,</span>
+    <span class="n">precision_recall_curve</span><span class="p">,</span>
+    <span class="n">auc</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;XGBoost version : </span><span class="si">{</span><span class="n">xgb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Numpy version   : </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pandas version  : </span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>XGBoost version : 3.2.0
+Numpy version   : 2.2.5
+Pandas version  : 2.3.3
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="rutas-y-directorios">
+<h2>2. Rutas y directorios<a class="headerlink" href="#rutas-y-directorios" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Rutas base ────────────────────────────────────────────────────────────────</span>
+<span class="n">BASE_DIR</span>      <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">))</span>
+<span class="n">DATA_DIR</span>      <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="n">ARTIFACTS_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;artifacts&#39;</span><span class="p">)</span>
+<span class="n">MODELS_DIR</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span>
+<span class="n">METRICS_DIR</span>   <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;metrics&#39;</span><span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span>  <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">METRICS_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">MODEL_NAME</span>    <span class="o">=</span> <span class="s1">&#39;tfidf_xgboost&#39;</span>
+<span class="n">METRICS_PATH</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">METRICS_DIR</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+<span class="n">MODEL_PATH</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span>  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span>   <span class="c1"># formato nativo XGBoost</span>
+<span class="n">TFIDF_PATH</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span>  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s1">_tfidf.pkl&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Directorios:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  DATA      : </span><span class="si">{</span><span class="n">DATA_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ARTIFACTS : </span><span class="si">{</span><span class="n">ARTIFACTS_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  MODELS    : </span><span class="si">{</span><span class="n">MODELS_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  METRICS   : </span><span class="si">{</span><span class="n">METRICS_DIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Directorios:
+  DATA      : /home/alejo/DeepLearning/miniproyecto3/data
+  ARTIFACTS : /home/alejo/DeepLearning/miniproyecto3/artifacts
+  MODELS    : /home/alejo/DeepLearning/miniproyecto3/models
+  METRICS   : /home/alejo/DeepLearning/miniproyecto3/artifacts/metrics
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="carga-de-datos-y-artefactos-del-eda">
+<h2>3. Carga de datos y artefactos del EDA<a class="headerlink" href="#carga-de-datos-y-artefactos-del-eda" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── CSV original (necesitamos clean_text y los índices del split) ─────────────</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;Resume.csv&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset cargado: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset cargado: (2484, 4)
+[&#39;ID&#39;, &#39;Resume_str&#39;, &#39;Resume_html&#39;, &#39;Category&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Artefactos del EDA ────────────────────────────────────────────────────────</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;label_encoder.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">le</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;config.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Etiquetas codificadas por split</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_train.npy&#39;</span><span class="p">))</span>
+<span class="n">y_val</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_val.npy&#39;</span><span class="p">))</span>
+<span class="n">y_test</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_test.npy&#39;</span><span class="p">))</span>
+
+<span class="n">NUM_CLASSES</span>  <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;NUM_CLASSES&#39;</span><span class="p">]</span>
+<span class="n">CLASS_NAMES</span>  <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">classes_</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NUM_CLASSES  : </span><span class="si">{</span><span class="n">NUM_CLASSES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train size   : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Val size     : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test size    : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Clases       : </span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NUM_CLASSES  : 24
+Train size   : 1738
+Val size     : 373
+Test size    : 373
+Clases       : [&#39;ACCOUNTANT&#39; &#39;ADVOCATE&#39; &#39;AGRICULTURE&#39; &#39;APPAREL&#39; &#39;ARTS&#39; &#39;AUTOMOBILE&#39;
+ &#39;AVIATION&#39; &#39;BANKING&#39; &#39;BPO&#39; &#39;BUSINESS-DEVELOPMENT&#39; &#39;CHEF&#39; &#39;CONSTRUCTION&#39;
+ &#39;CONSULTANT&#39; &#39;DESIGNER&#39; &#39;DIGITAL-MEDIA&#39; &#39;ENGINEERING&#39; &#39;FINANCE&#39; &#39;FITNESS&#39;
+ &#39;HEALTHCARE&#39; &#39;HR&#39; &#39;INFORMATION-TECHNOLOGY&#39; &#39;PUBLIC-RELATIONS&#39; &#39;SALES&#39;
+ &#39;TEACHER&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reproduce el split exacto del EDA usando la misma semilla.</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span><span class="o">,</span><span class="w"> </span><span class="nn">nltk</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;stopwords&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nltk.corpus</span><span class="w"> </span><span class="kn">import</span> <span class="n">stopwords</span>
+<span class="n">STOPWORDS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clean_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;http\S+|www\.\S+|\S+@\S+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^a-z\s]&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">w</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">STOPWORDS</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="s1">&#39;clean_text&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Resume_str&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">clean_text</span><span class="p">)</span>
+
+<span class="n">le_alt</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+<span class="n">y_encoded</span> <span class="o">=</span> <span class="n">le_alt</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Category&#39;</span><span class="p">])</span>
+<span class="n">idx_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+
+<span class="n">idx_train</span><span class="p">,</span> <span class="n">idx_temp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y_temp</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">idx_all</span><span class="p">,</span> <span class="n">y_encoded</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.30</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_encoded</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">idx_val</span><span class="p">,</span> <span class="n">idx_test</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">idx_temp</span><span class="p">,</span> <span class="n">y_temp</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_temp</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="n">text_train</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx_train</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">text_val</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx_val</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">text_test</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx_test</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_encoded</span><span class="p">[</span><span class="n">idx_train</span><span class="p">]</span>
+<span class="n">y_val</span>   <span class="o">=</span> <span class="n">y_encoded</span><span class="p">[</span><span class="n">idx_val</span><span class="p">]</span>
+<span class="n">y_test</span>  <span class="o">=</span> <span class="n">y_encoded</span><span class="p">[</span><span class="n">idx_test</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Split reproducido correctamente.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Split reproducido correctamente.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="vectorizacion-tf-idf">
+<h2>4. Vectorización TF-IDF<a class="headerlink" href="#vectorizacion-tf-idf" title="Link to this heading">#</a></h2>
+<p>El vectorizador se fittea <strong>solo sobre train</strong> para evitar data leakage — mismo principio aplicado al Tokenizer en el EDA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Hiperparámetros TF-IDF ────────────────────────────────────────────────────</span>
+<span class="n">TFIDF_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">max_features</span>  <span class="o">=</span> <span class="mi">50_000</span><span class="p">,</span>   <span class="c1"># vocabulario amplio — texto largo de CVs</span>
+    <span class="n">ngram_range</span>   <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>   <span class="c1"># unigramas + bigramas</span>
+    <span class="n">sublinear_tf</span>  <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>     <span class="c1"># log(1+tf) — reduce dominancia de términos muy frecuentes</span>
+    <span class="n">min_df</span>        <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>        <span class="c1"># ignorar términos que aparecen en menos de 2 docs</span>
+    <span class="n">max_df</span>        <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>     <span class="c1"># ignorar términos en más del 95% de docs (stop-like)</span>
+    <span class="n">analyzer</span>      <span class="o">=</span> <span class="s1">&#39;word&#39;</span><span class="p">,</span>
+    <span class="n">strip_accents</span> <span class="o">=</span> <span class="s1">&#39;unicode&#39;</span><span class="p">,</span>
+    <span class="n">dtype</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parámetros TF-IDF:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">TFIDF_PARAMS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parámetros TF-IDF:
+  max_features   : 50000
+  ngram_range    : (1, 2)
+  sublinear_tf   : True
+  min_df         : 2
+  max_df         : 0.95
+  analyzer       : word
+  strip_accents  : unicode
+  dtype          : &lt;class &#39;numpy.float32&#39;&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Fit solo sobre train ──────────────────────────────────────────────────────</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fiteando TF-IDF sobre train...&quot;</span><span class="p">)</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="o">**</span><span class="n">TFIDF_PARAMS</span><span class="p">)</span>
+<span class="n">X_train_tfidf</span> <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">text_train</span><span class="p">)</span>   <span class="c1"># fit + transform</span>
+<span class="n">X_val_tfidf</span>   <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">text_val</span><span class="p">)</span>          <span class="c1"># solo transform</span>
+<span class="n">X_test_tfidf</span>  <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">text_test</span><span class="p">)</span>         <span class="c1"># solo transform</span>
+
+<span class="n">tfidf_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Vocabulario efectivo : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tfidf</span><span class="o">.</span><span class="n">vocabulary_</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> términos&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape train          : </span><span class="si">{</span><span class="n">X_train_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape val            : </span><span class="si">{</span><span class="n">X_val_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape test           : </span><span class="si">{</span><span class="n">X_test_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tiempo TF-IDF        : </span><span class="si">{</span><span class="n">tfidf_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparsity train       : </span><span class="si">{</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">X_train_tfidf</span><span class="o">.</span><span class="n">nnz</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">X_train_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">X_train_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fiteando TF-IDF sobre train...
+
+Vocabulario efectivo : 50,000 términos
+Shape train          : (1738, 50000)
+Shape val            : (373, 50000)
+Shape test           : (373, 50000)
+Tiempo TF-IDF        : 5.46s
+Sparsity train       : 0.9905
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="manejo-del-desbalance-de-clases">
+<h2>5. Manejo del desbalance de clases<a class="headerlink" href="#manejo-del-desbalance-de-clases" title="Link to this heading">#</a></h2>
+<p>El dataset tiene un desbalance de <strong>5.45x</strong> (120 muestras en IT/Business-Dev vs 22 en BPO). Usamos <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> para compensar — XGBoost lo aplica por muestra durante el entrenamiento.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Desbalance 5.45x — XGBoost es robusto sin sample_weight a este nivel</span>
+<span class="c1"># Ver BUG-04 en knowledge base: sample_weight desestabiliza el entrenamiento</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Distribución de clases en train:&quot;</span><span class="p">)</span>
+<span class="n">classes</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">le</span><span class="o">.</span><span class="n">classes_</span><span class="p">,</span> <span class="n">counts</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">c</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Ratio max/min: </span><span class="si">{</span><span class="n">counts</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="n">counts</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Distribución de clases en train:
+  ACCOUNTANT               : 83
+  ADVOCATE                 : 83
+  AGRICULTURE              : 44
+  APPAREL                  : 68
+  ARTS                     : 72
+  AUTOMOBILE               : 25
+  AVIATION                 : 82
+  BANKING                  : 80
+  BPO                      : 15
+  BUSINESS-DEVELOPMENT     : 84
+  CHEF                     : 83
+  CONSTRUCTION             : 78
+  CONSULTANT               : 80
+  DESIGNER                 : 75
+  DIGITAL-MEDIA            : 67
+  ENGINEERING              : 83
+  FINANCE                  : 83
+  FITNESS                  : 82
+  HEALTHCARE               : 80
+  HR                       : 77
+  INFORMATION-TECHNOLOGY   : 84
+  PUBLIC-RELATIONS         : 78
+  SALES                    : 81
+  TEACHER                  : 71
+
+Ratio max/min: 5.60x
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="entrenamiento-xgboost">
+<h2>6. Entrenamiento XGBoost<a class="headerlink" href="#entrenamiento-xgboost" title="Link to this heading">#</a></h2>
+<p>XGBoost con aceleración GPU (<code class="docutils literal notranslate"><span class="pre">device='cuda'</span></code>). Si CUDA no está disponible, cambia a <code class="docutils literal notranslate"><span class="pre">device='cpu'</span></code> automáticamente.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">probe</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_class</span><span class="o">=</span><span class="n">NUM_CLASSES</span><span class="p">)</span>
+    <span class="c1"># Usar datos sintéticos con todas las clases garantizadas</span>
+    <span class="n">X_probe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">y_probe</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">)</span>
+    <span class="n">probe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_probe</span><span class="p">,</span> <span class="n">y_probe</span><span class="p">)</span>
+    <span class="n">DEVICE</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU (CUDA) disponible — usando aceleración GPU&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">DEVICE</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU no disponible (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">) — usando CPU&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device seleccionado: </span><span class="si">{</span><span class="n">DEVICE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPU (CUDA) disponible — usando aceleración GPU
+Device seleccionado: cuda
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Hiperparámetros XGBoost ───────────────────────────────────────────────────</span>
+<span class="n">XGB_PARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">n_estimators</span>          <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">max_depth</span>             <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="n">learning_rate</span>         <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">subsample</span>             <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>      <span class="c1"># ← simplificado</span>
+    <span class="n">colsample_bytree</span>      <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>      <span class="c1"># ← simplificado</span>
+    <span class="n">min_child_weight</span>      <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1"># ← simplificado</span>
+    <span class="n">gamma</span>                 <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>      <span class="c1"># ← simplificado (default)</span>
+    <span class="n">reg_alpha</span>             <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>      <span class="c1"># ← simplificado (default)</span>
+    <span class="n">reg_lambda</span>            <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>      <span class="c1"># default de XGBoost</span>
+    <span class="n">objective</span>             <span class="o">=</span> <span class="s1">&#39;multi:softprob&#39;</span><span class="p">,</span>
+    <span class="n">num_class</span>             <span class="o">=</span> <span class="n">NUM_CLASSES</span><span class="p">,</span>
+    <span class="n">eval_metric</span>           <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mlogloss&#39;</span><span class="p">,</span> <span class="s1">&#39;merror&#39;</span><span class="p">],</span>
+    <span class="n">early_stopping_rounds</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">device</span>                <span class="o">=</span> <span class="n">DEVICE</span><span class="p">,</span>
+    <span class="n">random_state</span>          <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="n">n_jobs</span>                <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">verbosity</span>             <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hiperparámetros XGBoost:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">XGB_PARAMS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hiperparámetros XGBoost:
+  n_estimators             : 500
+  max_depth                : 6
+  learning_rate            : 0.1
+  subsample                : 1.0
+  colsample_bytree         : 1.0
+  min_child_weight         : 1
+  gamma                    : 0.0
+  reg_alpha                : 1.0
+  reg_lambda               : 5.0
+  objective                : multi:softprob
+  num_class                : 24
+  eval_metric              : [&#39;mlogloss&#39;, &#39;merror&#39;]
+  early_stopping_rounds    : 50
+  device                   : cuda
+  random_state             : 42
+  n_jobs                   : -1
+  verbosity                : 1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Entrenamiento ─────────────────────────────────────────────────────────────</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Entrenando XGBoost...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Train shape: </span><span class="si">{</span><span class="n">X_train_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Val shape  : </span><span class="si">{</span><span class="n">X_val_tfidf</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span><span class="o">**</span><span class="n">XGB_PARAMS</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">X_train_tfidf</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+    <span class="n">eval_set</span>        <span class="o">=</span> <span class="p">[(</span><span class="n">X_train_tfidf</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_val_tfidf</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)],</span>
+    <span class="n">verbose</span>         <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>   <span class="c1"># print cada 50 rounds</span>
+<span class="p">)</span>
+
+<span class="n">training_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t_start</span>
+
+<span class="n">best_round</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">best_iteration</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Entrenamiento completado en </span><span class="si">{</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mejor iteración (early stopping): </span><span class="si">{</span><span class="n">best_round</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Entrenando XGBoost...
+  Train shape: (1738, 50000)
+  Val shape  : (373, 50000)
+
+[0]	validation_0-mlogloss:2.74425	validation_0-merror:0.23418	validation_1-mlogloss:2.81843	validation_1-merror:0.38606
+[1]	validation_0-mlogloss:2.43645	validation_0-merror:0.16801	validation_1-mlogloss:2.57116	validation_1-merror:0.33780
+[2]	validation_0-mlogloss:2.18953	validation_0-merror:0.14212	validation_1-mlogloss:2.40186	validation_1-merror:0.31903
+[3]	validation_0-mlogloss:1.98591	validation_0-merror:0.12658	validation_1-mlogloss:2.25171	validation_1-merror:0.30295
+[4]	validation_0-mlogloss:1.81514	validation_0-merror:0.11220	validation_1-mlogloss:2.12426	validation_1-merror:0.30295
+[5]	validation_0-mlogloss:1.66868	validation_0-merror:0.10644	validation_1-mlogloss:2.01229	validation_1-merror:0.29223
+[6]	validation_0-mlogloss:1.54038	validation_0-merror:0.09781	validation_1-mlogloss:1.91779	validation_1-merror:0.29491
+[7]	validation_0-mlogloss:1.42755	validation_0-merror:0.08516	validation_1-mlogloss:1.83316	validation_1-merror:0.29223
+[8]	validation_0-mlogloss:1.32637	validation_0-merror:0.08228	validation_1-mlogloss:1.75926	validation_1-merror:0.28150
+[9]	validation_0-mlogloss:1.23583	validation_0-merror:0.07595	validation_1-mlogloss:1.69126	validation_1-merror:0.27882
+[10]	validation_0-mlogloss:1.15395	validation_0-merror:0.07135	validation_1-mlogloss:1.63423	validation_1-merror:0.28150
+[11]	validation_0-mlogloss:1.07944	validation_0-merror:0.06904	validation_1-mlogloss:1.58221	validation_1-merror:0.28954
+[12]	validation_0-mlogloss:1.01253	validation_0-merror:0.06789	validation_1-mlogloss:1.53345	validation_1-merror:0.28954
+[13]	validation_0-mlogloss:0.95036	validation_0-merror:0.06329	validation_1-mlogloss:1.48642	validation_1-merror:0.28686
+[14]	validation_0-mlogloss:0.89413	validation_0-merror:0.06041	validation_1-mlogloss:1.44539	validation_1-merror:0.28954
+[15]	validation_0-mlogloss:0.84173	validation_0-merror:0.05811	validation_1-mlogloss:1.41020	validation_1-merror:0.28150
+[16]	validation_0-mlogloss:0.79412	validation_0-merror:0.05236	validation_1-mlogloss:1.37626	validation_1-merror:0.28150
+[17]	validation_0-mlogloss:0.74923	validation_0-merror:0.04891	validation_1-mlogloss:1.34484	validation_1-merror:0.27882
+[18]	validation_0-mlogloss:0.70813	validation_0-merror:0.04545	validation_1-mlogloss:1.31484	validation_1-merror:0.27614
+[19]	validation_0-mlogloss:0.66967	validation_0-merror:0.04258	validation_1-mlogloss:1.28712	validation_1-merror:0.27078
+[20]	validation_0-mlogloss:0.63413	validation_0-merror:0.04200	validation_1-mlogloss:1.26082	validation_1-merror:0.27346
+[21]	validation_0-mlogloss:0.60128	validation_0-merror:0.03970	validation_1-mlogloss:1.23771	validation_1-merror:0.26273
+[22]	validation_0-mlogloss:0.57058	validation_0-merror:0.03855	validation_1-mlogloss:1.21608	validation_1-merror:0.26542
+[23]	validation_0-mlogloss:0.54201	validation_0-merror:0.03567	validation_1-mlogloss:1.19455	validation_1-merror:0.26273
+[24]	validation_0-mlogloss:0.51540	validation_0-merror:0.03452	validation_1-mlogloss:1.17579	validation_1-merror:0.26273
+[25]	validation_0-mlogloss:0.49060	validation_0-merror:0.03049	validation_1-mlogloss:1.15748	validation_1-merror:0.25737
+[26]	validation_0-mlogloss:0.46705	validation_0-merror:0.02762	validation_1-mlogloss:1.14124	validation_1-merror:0.25469
+[27]	validation_0-mlogloss:0.44543	validation_0-merror:0.02359	validation_1-mlogloss:1.12716	validation_1-merror:0.24933
+[28]	validation_0-mlogloss:0.42490	validation_0-merror:0.02301	validation_1-mlogloss:1.11441	validation_1-merror:0.25469
+[29]	validation_0-mlogloss:0.40583	validation_0-merror:0.02129	validation_1-mlogloss:1.10079	validation_1-merror:0.25737
+[30]	validation_0-mlogloss:0.38779	validation_0-merror:0.01784	validation_1-mlogloss:1.08945	validation_1-merror:0.25469
+[31]	validation_0-mlogloss:0.37099	validation_0-merror:0.01726	validation_1-mlogloss:1.07827	validation_1-merror:0.25469
+[32]	validation_0-mlogloss:0.35505	validation_0-merror:0.01554	validation_1-mlogloss:1.06862	validation_1-merror:0.25201
+[33]	validation_0-mlogloss:0.34012	validation_0-merror:0.01438	validation_1-mlogloss:1.05866	validation_1-merror:0.25469
+[34]	validation_0-mlogloss:0.32593	validation_0-merror:0.01266	validation_1-mlogloss:1.04762	validation_1-merror:0.25469
+[35]	validation_0-mlogloss:0.31288	validation_0-merror:0.01208	validation_1-mlogloss:1.04036	validation_1-merror:0.25737
+[36]	validation_0-mlogloss:0.30060	validation_0-merror:0.00978	validation_1-mlogloss:1.03219	validation_1-merror:0.26273
+[37]	validation_0-mlogloss:0.28885	validation_0-merror:0.00921	validation_1-mlogloss:1.02410	validation_1-merror:0.26005
+[38]	validation_0-mlogloss:0.27787	validation_0-merror:0.00748	validation_1-mlogloss:1.01692	validation_1-merror:0.26005
+[39]	validation_0-mlogloss:0.26724	validation_0-merror:0.00633	validation_1-mlogloss:1.00983	validation_1-merror:0.25737
+[40]	validation_0-mlogloss:0.25759	validation_0-merror:0.00575	validation_1-mlogloss:1.00442	validation_1-merror:0.26005
+[41]	validation_0-mlogloss:0.24838	validation_0-merror:0.00518	validation_1-mlogloss:0.99879	validation_1-merror:0.25737
+[42]	validation_0-mlogloss:0.23965	validation_0-merror:0.00518	validation_1-mlogloss:0.99222	validation_1-merror:0.25737
+[43]	validation_0-mlogloss:0.23128	validation_0-merror:0.00403	validation_1-mlogloss:0.98711	validation_1-merror:0.25469
+[44]	validation_0-mlogloss:0.22353	validation_0-merror:0.00403	validation_1-mlogloss:0.98218	validation_1-merror:0.25737
+[45]	validation_0-mlogloss:0.21612	validation_0-merror:0.00345	validation_1-mlogloss:0.97705	validation_1-merror:0.25469
+[46]	validation_0-mlogloss:0.20905	validation_0-merror:0.00345	validation_1-mlogloss:0.97094	validation_1-merror:0.25469
+[47]	validation_0-mlogloss:0.20234	validation_0-merror:0.00230	validation_1-mlogloss:0.96591	validation_1-merror:0.25737
+[48]	validation_0-mlogloss:0.19607	validation_0-merror:0.00230	validation_1-mlogloss:0.96166	validation_1-merror:0.25737
+[49]	validation_0-mlogloss:0.19006	validation_0-merror:0.00173	validation_1-mlogloss:0.95750	validation_1-merror:0.25201
+[50]	validation_0-mlogloss:0.18430	validation_0-merror:0.00173	validation_1-mlogloss:0.95351	validation_1-merror:0.25201
+[51]	validation_0-mlogloss:0.17887	validation_0-merror:0.00173	validation_1-mlogloss:0.94967	validation_1-merror:0.24933
+[52]	validation_0-mlogloss:0.17380	validation_0-merror:0.00173	validation_1-mlogloss:0.94644	validation_1-merror:0.24397
+[53]	validation_0-mlogloss:0.16895	validation_0-merror:0.00115	validation_1-mlogloss:0.94340	validation_1-merror:0.24397
+[54]	validation_0-mlogloss:0.16432	validation_0-merror:0.00058	validation_1-mlogloss:0.94083	validation_1-merror:0.24397
+[55]	validation_0-mlogloss:0.15980	validation_0-merror:0.00058	validation_1-mlogloss:0.93741	validation_1-merror:0.24397
+[56]	validation_0-mlogloss:0.15567	validation_0-merror:0.00000	validation_1-mlogloss:0.93528	validation_1-merror:0.24665
+[57]	validation_0-mlogloss:0.15163	validation_0-merror:0.00000	validation_1-mlogloss:0.93284	validation_1-merror:0.24665
+[58]	validation_0-mlogloss:0.14775	validation_0-merror:0.00000	validation_1-mlogloss:0.93019	validation_1-merror:0.24665
+[59]	validation_0-mlogloss:0.14402	validation_0-merror:0.00000	validation_1-mlogloss:0.92688	validation_1-merror:0.24665
+[60]	validation_0-mlogloss:0.14052	validation_0-merror:0.00000	validation_1-mlogloss:0.92414	validation_1-merror:0.24665
+[61]	validation_0-mlogloss:0.13720	validation_0-merror:0.00000	validation_1-mlogloss:0.92245	validation_1-merror:0.24665
+[62]	validation_0-mlogloss:0.13395	validation_0-merror:0.00000	validation_1-mlogloss:0.92084	validation_1-merror:0.24397
+[63]	validation_0-mlogloss:0.13078	validation_0-merror:0.00000	validation_1-mlogloss:0.91840	validation_1-merror:0.24129
+[64]	validation_0-mlogloss:0.12791	validation_0-merror:0.00000	validation_1-mlogloss:0.91652	validation_1-merror:0.23861
+[65]	validation_0-mlogloss:0.12499	validation_0-merror:0.00000	validation_1-mlogloss:0.91467	validation_1-merror:0.24129
+[66]	validation_0-mlogloss:0.12235	validation_0-merror:0.00000	validation_1-mlogloss:0.91307	validation_1-merror:0.24397
+[67]	validation_0-mlogloss:0.11979	validation_0-merror:0.00000	validation_1-mlogloss:0.91067	validation_1-merror:0.23861
+[68]	validation_0-mlogloss:0.11732	validation_0-merror:0.00000	validation_1-mlogloss:0.90908	validation_1-merror:0.23861
+[69]	validation_0-mlogloss:0.11495	validation_0-merror:0.00000	validation_1-mlogloss:0.90794	validation_1-merror:0.23861
+[70]	validation_0-mlogloss:0.11264	validation_0-merror:0.00000	validation_1-mlogloss:0.90574	validation_1-merror:0.23861
+[71]	validation_0-mlogloss:0.11044	validation_0-merror:0.00000	validation_1-mlogloss:0.90430	validation_1-merror:0.23861
+[72]	validation_0-mlogloss:0.10829	validation_0-merror:0.00000	validation_1-mlogloss:0.90314	validation_1-merror:0.23861
+[73]	validation_0-mlogloss:0.10632	validation_0-merror:0.00000	validation_1-mlogloss:0.90255	validation_1-merror:0.23861
+[74]	validation_0-mlogloss:0.10439	validation_0-merror:0.00000	validation_1-mlogloss:0.90061	validation_1-merror:0.23861
+[75]	validation_0-mlogloss:0.10249	validation_0-merror:0.00000	validation_1-mlogloss:0.89954	validation_1-merror:0.23861
+[76]	validation_0-mlogloss:0.10073	validation_0-merror:0.00000	validation_1-mlogloss:0.89834	validation_1-merror:0.23861
+[77]	validation_0-mlogloss:0.09904	validation_0-merror:0.00000	validation_1-mlogloss:0.89742	validation_1-merror:0.23592
+[78]	validation_0-mlogloss:0.09737	validation_0-merror:0.00000	validation_1-mlogloss:0.89647	validation_1-merror:0.23592
+[79]	validation_0-mlogloss:0.09579	validation_0-merror:0.00000	validation_1-mlogloss:0.89548	validation_1-merror:0.23592
+[80]	validation_0-mlogloss:0.09428	validation_0-merror:0.00000	validation_1-mlogloss:0.89443	validation_1-merror:0.23592
+[81]	validation_0-mlogloss:0.09274	validation_0-merror:0.00000	validation_1-mlogloss:0.89351	validation_1-merror:0.23324
+[82]	validation_0-mlogloss:0.09130	validation_0-merror:0.00000	validation_1-mlogloss:0.89179	validation_1-merror:0.23324
+[83]	validation_0-mlogloss:0.08984	validation_0-merror:0.00000	validation_1-mlogloss:0.89152	validation_1-merror:0.23324
+[84]	validation_0-mlogloss:0.08851	validation_0-merror:0.00000	validation_1-mlogloss:0.89085	validation_1-merror:0.23324
+[85]	validation_0-mlogloss:0.08716	validation_0-merror:0.00000	validation_1-mlogloss:0.88994	validation_1-merror:0.23324
+[86]	validation_0-mlogloss:0.08587	validation_0-merror:0.00000	validation_1-mlogloss:0.88867	validation_1-merror:0.23324
+[87]	validation_0-mlogloss:0.08471	validation_0-merror:0.00000	validation_1-mlogloss:0.88768	validation_1-merror:0.23324
+[88]	validation_0-mlogloss:0.08354	validation_0-merror:0.00000	validation_1-mlogloss:0.88669	validation_1-merror:0.23324
+[89]	validation_0-mlogloss:0.08239	validation_0-merror:0.00000	validation_1-mlogloss:0.88626	validation_1-merror:0.23324
+[90]	validation_0-mlogloss:0.08130	validation_0-merror:0.00000	validation_1-mlogloss:0.88562	validation_1-merror:0.23324
+[91]	validation_0-mlogloss:0.08021	validation_0-merror:0.00000	validation_1-mlogloss:0.88501	validation_1-merror:0.22788
+[92]	validation_0-mlogloss:0.07918	validation_0-merror:0.00000	validation_1-mlogloss:0.88417	validation_1-merror:0.22788
+[93]	validation_0-mlogloss:0.07818	validation_0-merror:0.00000	validation_1-mlogloss:0.88352	validation_1-merror:0.22788
+[94]	validation_0-mlogloss:0.07720	validation_0-merror:0.00000	validation_1-mlogloss:0.88324	validation_1-merror:0.22788
+[95]	validation_0-mlogloss:0.07626	validation_0-merror:0.00000	validation_1-mlogloss:0.88266	validation_1-merror:0.22788
+[96]	validation_0-mlogloss:0.07533	validation_0-merror:0.00000	validation_1-mlogloss:0.88203	validation_1-merror:0.22788
+[97]	validation_0-mlogloss:0.07440	validation_0-merror:0.00000	validation_1-mlogloss:0.88137	validation_1-merror:0.22788
+[98]	validation_0-mlogloss:0.07356	validation_0-merror:0.00000	validation_1-mlogloss:0.88105	validation_1-merror:0.22788
+[99]	validation_0-mlogloss:0.07271	validation_0-merror:0.00000	validation_1-mlogloss:0.88036	validation_1-merror:0.22788
+[100]	validation_0-mlogloss:0.07192	validation_0-merror:0.00000	validation_1-mlogloss:0.88000	validation_1-merror:0.22788
+[101]	validation_0-mlogloss:0.07115	validation_0-merror:0.00000	validation_1-mlogloss:0.87939	validation_1-merror:0.22788
+[102]	validation_0-mlogloss:0.07037	validation_0-merror:0.00000	validation_1-mlogloss:0.87862	validation_1-merror:0.22788
+[103]	validation_0-mlogloss:0.06962	validation_0-merror:0.00000	validation_1-mlogloss:0.87806	validation_1-merror:0.22788
+[104]	validation_0-mlogloss:0.06890	validation_0-merror:0.00000	validation_1-mlogloss:0.87757	validation_1-merror:0.22788
+[105]	validation_0-mlogloss:0.06819	validation_0-merror:0.00000	validation_1-mlogloss:0.87682	validation_1-merror:0.22788
+[106]	validation_0-mlogloss:0.06748	validation_0-merror:0.00000	validation_1-mlogloss:0.87591	validation_1-merror:0.22788
+[107]	validation_0-mlogloss:0.06676	validation_0-merror:0.00000	validation_1-mlogloss:0.87515	validation_1-merror:0.22788
+[108]	validation_0-mlogloss:0.06612	validation_0-merror:0.00000	validation_1-mlogloss:0.87521	validation_1-merror:0.22788
+[109]	validation_0-mlogloss:0.06545	validation_0-merror:0.00000	validation_1-mlogloss:0.87415	validation_1-merror:0.22788
+[110]	validation_0-mlogloss:0.06482	validation_0-merror:0.00000	validation_1-mlogloss:0.87387	validation_1-merror:0.22788
+[111]	validation_0-mlogloss:0.06422	validation_0-merror:0.00000	validation_1-mlogloss:0.87340	validation_1-merror:0.22788
+[112]	validation_0-mlogloss:0.06365	validation_0-merror:0.00000	validation_1-mlogloss:0.87306	validation_1-merror:0.22788
+[113]	validation_0-mlogloss:0.06306	validation_0-merror:0.00000	validation_1-mlogloss:0.87184	validation_1-merror:0.22788
+[114]	validation_0-mlogloss:0.06247	validation_0-merror:0.00000	validation_1-mlogloss:0.87169	validation_1-merror:0.22788
+[115]	validation_0-mlogloss:0.06194	validation_0-merror:0.00000	validation_1-mlogloss:0.87132	validation_1-merror:0.22788
+[116]	validation_0-mlogloss:0.06141	validation_0-merror:0.00000	validation_1-mlogloss:0.87072	validation_1-merror:0.22788
+[117]	validation_0-mlogloss:0.06091	validation_0-merror:0.00000	validation_1-mlogloss:0.87054	validation_1-merror:0.22788
+[118]	validation_0-mlogloss:0.06034	validation_0-merror:0.00000	validation_1-mlogloss:0.87011	validation_1-merror:0.22788
+[119]	validation_0-mlogloss:0.05983	validation_0-merror:0.00000	validation_1-mlogloss:0.86929	validation_1-merror:0.22520
+[120]	validation_0-mlogloss:0.05935	validation_0-merror:0.00000	validation_1-mlogloss:0.86941	validation_1-merror:0.22788
+[121]	validation_0-mlogloss:0.05887	validation_0-merror:0.00000	validation_1-mlogloss:0.86870	validation_1-merror:0.22520
+[122]	validation_0-mlogloss:0.05843	validation_0-merror:0.00000	validation_1-mlogloss:0.86877	validation_1-merror:0.22520
+[123]	validation_0-mlogloss:0.05793	validation_0-merror:0.00000	validation_1-mlogloss:0.86850	validation_1-merror:0.22520
+[124]	validation_0-mlogloss:0.05750	validation_0-merror:0.00000	validation_1-mlogloss:0.86782	validation_1-merror:0.22520
+[125]	validation_0-mlogloss:0.05711	validation_0-merror:0.00000	validation_1-mlogloss:0.86760	validation_1-merror:0.22520
+[126]	validation_0-mlogloss:0.05671	validation_0-merror:0.00000	validation_1-mlogloss:0.86754	validation_1-merror:0.22520
+[127]	validation_0-mlogloss:0.05629	validation_0-merror:0.00000	validation_1-mlogloss:0.86706	validation_1-merror:0.22520
+[128]	validation_0-mlogloss:0.05590	validation_0-merror:0.00000	validation_1-mlogloss:0.86681	validation_1-merror:0.22520
+[129]	validation_0-mlogloss:0.05555	validation_0-merror:0.00000	validation_1-mlogloss:0.86656	validation_1-merror:0.22520
+[130]	validation_0-mlogloss:0.05520	validation_0-merror:0.00000	validation_1-mlogloss:0.86650	validation_1-merror:0.22520
+[131]	validation_0-mlogloss:0.05486	validation_0-merror:0.00000	validation_1-mlogloss:0.86607	validation_1-merror:0.22520
+[132]	validation_0-mlogloss:0.05456	validation_0-merror:0.00000	validation_1-mlogloss:0.86566	validation_1-merror:0.22520
+[133]	validation_0-mlogloss:0.05426	validation_0-merror:0.00000	validation_1-mlogloss:0.86585	validation_1-merror:0.22520
+[134]	validation_0-mlogloss:0.05396	validation_0-merror:0.00000	validation_1-mlogloss:0.86508	validation_1-merror:0.22520
+[135]	validation_0-mlogloss:0.05367	validation_0-merror:0.00000	validation_1-mlogloss:0.86512	validation_1-merror:0.22520
+[136]	validation_0-mlogloss:0.05337	validation_0-merror:0.00000	validation_1-mlogloss:0.86476	validation_1-merror:0.22520
+[137]	validation_0-mlogloss:0.05312	validation_0-merror:0.00000	validation_1-mlogloss:0.86469	validation_1-merror:0.22520
+[138]	validation_0-mlogloss:0.05288	validation_0-merror:0.00000	validation_1-mlogloss:0.86478	validation_1-merror:0.22520
+[139]	validation_0-mlogloss:0.05267	validation_0-merror:0.00000	validation_1-mlogloss:0.86443	validation_1-merror:0.22252
+[140]	validation_0-mlogloss:0.05248	validation_0-merror:0.00000	validation_1-mlogloss:0.86440	validation_1-merror:0.22252
+[141]	validation_0-mlogloss:0.05230	validation_0-merror:0.00000	validation_1-mlogloss:0.86413	validation_1-merror:0.22252
+[142]	validation_0-mlogloss:0.05209	validation_0-merror:0.00000	validation_1-mlogloss:0.86410	validation_1-merror:0.22252
+[143]	validation_0-mlogloss:0.05190	validation_0-merror:0.00000	validation_1-mlogloss:0.86360	validation_1-merror:0.22252
+[144]	validation_0-mlogloss:0.05173	validation_0-merror:0.00000	validation_1-mlogloss:0.86352	validation_1-merror:0.21984
+[145]	validation_0-mlogloss:0.05157	validation_0-merror:0.00000	validation_1-mlogloss:0.86317	validation_1-merror:0.21984
+[146]	validation_0-mlogloss:0.05139	validation_0-merror:0.00000	validation_1-mlogloss:0.86304	validation_1-merror:0.21984
+[147]	validation_0-mlogloss:0.05124	validation_0-merror:0.00000	validation_1-mlogloss:0.86283	validation_1-merror:0.21984
+[148]	validation_0-mlogloss:0.05108	validation_0-merror:0.00000	validation_1-mlogloss:0.86283	validation_1-merror:0.21984
+[149]	validation_0-mlogloss:0.05092	validation_0-merror:0.00000	validation_1-mlogloss:0.86260	validation_1-merror:0.21984
+[150]	validation_0-mlogloss:0.05080	validation_0-merror:0.00000	validation_1-mlogloss:0.86260	validation_1-merror:0.21984
+[151]	validation_0-mlogloss:0.05070	validation_0-merror:0.00000	validation_1-mlogloss:0.86230	validation_1-merror:0.21984
+[152]	validation_0-mlogloss:0.05056	validation_0-merror:0.00000	validation_1-mlogloss:0.86227	validation_1-merror:0.21984
+[153]	validation_0-mlogloss:0.05047	validation_0-merror:0.00000	validation_1-mlogloss:0.86212	validation_1-merror:0.21984
+[154]	validation_0-mlogloss:0.05035	validation_0-merror:0.00000	validation_1-mlogloss:0.86198	validation_1-merror:0.21984
+[155]	validation_0-mlogloss:0.05024	validation_0-merror:0.00000	validation_1-mlogloss:0.86207	validation_1-merror:0.21984
+[156]	validation_0-mlogloss:0.05014	validation_0-merror:0.00000	validation_1-mlogloss:0.86185	validation_1-merror:0.21984
+[157]	validation_0-mlogloss:0.05006	validation_0-merror:0.00000	validation_1-mlogloss:0.86186	validation_1-merror:0.21984
+[158]	validation_0-mlogloss:0.04997	validation_0-merror:0.00000	validation_1-mlogloss:0.86160	validation_1-merror:0.21984
+[159]	validation_0-mlogloss:0.04987	validation_0-merror:0.00000	validation_1-mlogloss:0.86163	validation_1-merror:0.21984
+[160]	validation_0-mlogloss:0.04979	validation_0-merror:0.00000	validation_1-mlogloss:0.86176	validation_1-merror:0.21984
+[161]	validation_0-mlogloss:0.04971	validation_0-merror:0.00000	validation_1-mlogloss:0.86155	validation_1-merror:0.21984
+[162]	validation_0-mlogloss:0.04964	validation_0-merror:0.00000	validation_1-mlogloss:0.86147	validation_1-merror:0.21984
+[163]	validation_0-mlogloss:0.04957	validation_0-merror:0.00000	validation_1-mlogloss:0.86141	validation_1-merror:0.21984
+[164]	validation_0-mlogloss:0.04951	validation_0-merror:0.00000	validation_1-mlogloss:0.86159	validation_1-merror:0.21984
+[165]	validation_0-mlogloss:0.04944	validation_0-merror:0.00000	validation_1-mlogloss:0.86144	validation_1-merror:0.21984
+[166]	validation_0-mlogloss:0.04938	validation_0-merror:0.00000	validation_1-mlogloss:0.86161	validation_1-merror:0.21984
+[167]	validation_0-mlogloss:0.04933	validation_0-merror:0.00000	validation_1-mlogloss:0.86147	validation_1-merror:0.21984
+[168]	validation_0-mlogloss:0.04926	validation_0-merror:0.00000	validation_1-mlogloss:0.86154	validation_1-merror:0.21984
+[169]	validation_0-mlogloss:0.04919	validation_0-merror:0.00000	validation_1-mlogloss:0.86142	validation_1-merror:0.21984
+[170]	validation_0-mlogloss:0.04913	validation_0-merror:0.00000	validation_1-mlogloss:0.86136	validation_1-merror:0.21984
+[171]	validation_0-mlogloss:0.04907	validation_0-merror:0.00000	validation_1-mlogloss:0.86136	validation_1-merror:0.21984
+[172]	validation_0-mlogloss:0.04902	validation_0-merror:0.00000	validation_1-mlogloss:0.86139	validation_1-merror:0.21984
+[173]	validation_0-mlogloss:0.04898	validation_0-merror:0.00000	validation_1-mlogloss:0.86132	validation_1-merror:0.21984
+[174]	validation_0-mlogloss:0.04894	validation_0-merror:0.00000	validation_1-mlogloss:0.86134	validation_1-merror:0.21984
+[175]	validation_0-mlogloss:0.04889	validation_0-merror:0.00000	validation_1-mlogloss:0.86136	validation_1-merror:0.21984
+[176]	validation_0-mlogloss:0.04886	validation_0-merror:0.00000	validation_1-mlogloss:0.86145	validation_1-merror:0.21984
+[177]	validation_0-mlogloss:0.04884	validation_0-merror:0.00000	validation_1-mlogloss:0.86146	validation_1-merror:0.21984
+[178]	validation_0-mlogloss:0.04882	validation_0-merror:0.00000	validation_1-mlogloss:0.86141	validation_1-merror:0.21984
+[179]	validation_0-mlogloss:0.04881	validation_0-merror:0.00000	validation_1-mlogloss:0.86141	validation_1-merror:0.21984
+[180]	validation_0-mlogloss:0.04879	validation_0-merror:0.00000	validation_1-mlogloss:0.86140	validation_1-merror:0.21984
+[181]	validation_0-mlogloss:0.04877	validation_0-merror:0.00000	validation_1-mlogloss:0.86139	validation_1-merror:0.21984
+[182]	validation_0-mlogloss:0.04875	validation_0-merror:0.00000	validation_1-mlogloss:0.86143	validation_1-merror:0.21984
+[183]	validation_0-mlogloss:0.04872	validation_0-merror:0.00000	validation_1-mlogloss:0.86146	validation_1-merror:0.21984
+[184]	validation_0-mlogloss:0.04871	validation_0-merror:0.00000	validation_1-mlogloss:0.86145	validation_1-merror:0.21984
+[185]	validation_0-mlogloss:0.04869	validation_0-merror:0.00000	validation_1-mlogloss:0.86149	validation_1-merror:0.21984
+[186]	validation_0-mlogloss:0.04867	validation_0-merror:0.00000	validation_1-mlogloss:0.86149	validation_1-merror:0.21984
+[187]	validation_0-mlogloss:0.04865	validation_0-merror:0.00000	validation_1-mlogloss:0.86152	validation_1-merror:0.21984
+[188]	validation_0-mlogloss:0.04863	validation_0-merror:0.00000	validation_1-mlogloss:0.86155	validation_1-merror:0.21984
+[189]	validation_0-mlogloss:0.04862	validation_0-merror:0.00000	validation_1-mlogloss:0.86152	validation_1-merror:0.21984
+[190]	validation_0-mlogloss:0.04860	validation_0-merror:0.00000	validation_1-mlogloss:0.86159	validation_1-merror:0.21984
+[191]	validation_0-mlogloss:0.04859	validation_0-merror:0.00000	validation_1-mlogloss:0.86154	validation_1-merror:0.21984
+[192]	validation_0-mlogloss:0.04857	validation_0-merror:0.00000	validation_1-mlogloss:0.86148	validation_1-merror:0.21984
+[193]	validation_0-mlogloss:0.04855	validation_0-merror:0.00000	validation_1-mlogloss:0.86149	validation_1-merror:0.21984
+[194]	validation_0-mlogloss:0.04853	validation_0-merror:0.00000	validation_1-mlogloss:0.86144	validation_1-merror:0.21984
+
+Entrenamiento completado en 207.2s
+Mejor iteración (early stopping): 144
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="curvas-de-entrenamiento">
+<h2>7. Curvas de entrenamiento<a class="headerlink" href="#curvas-de-entrenamiento" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Extraer historial de métricas ─────────────────────────────────────────────</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evals_result</span><span class="p">()</span>
+
+<span class="n">train_logloss</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;validation_0&#39;</span><span class="p">][</span><span class="s1">&#39;mlogloss&#39;</span><span class="p">]</span>
+<span class="n">val_logloss</span>   <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;validation_1&#39;</span><span class="p">][</span><span class="s1">&#39;mlogloss&#39;</span><span class="p">]</span>
+<span class="n">train_merror</span>  <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;validation_0&#39;</span><span class="p">][</span><span class="s1">&#39;merror&#39;</span><span class="p">]</span>
+<span class="n">val_merror</span>    <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;validation_1&#39;</span><span class="p">][</span><span class="s1">&#39;merror&#39;</span><span class="p">]</span>
+
+<span class="n">rounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_logloss</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas de entrenamiento — TF-IDF + XGBoost&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<span class="c1"># Log-loss</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rounds</span><span class="p">,</span> <span class="n">train_logloss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rounds</span><span class="p">,</span> <span class="n">val_logloss</span><span class="p">,</span>   <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val&#39;</span><span class="p">,</span>   <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tomato&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">best_round</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Best: </span><span class="si">{</span><span class="n">best_round</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Ronda&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Multiclass Log-Loss&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Log-Loss por ronda&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Error de clasificación</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rounds</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">train_merror</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train Acc&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rounds</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">val_merror</span><span class="p">],</span>   <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val Acc&#39;</span><span class="p">,</span>   <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tomato&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">best_round</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Best: </span><span class="si">{</span><span class="n">best_round</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Ronda&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Accuracy por ronda&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/efdd3b5fd6945c4c3c0f91f07daa0a84f84563562973cc9320b78afd99210248.png" src="../../_images/efdd3b5fd6945c4c3c0f91f07daa0a84f84563562973cc9320b78afd99210248.png" />
+</div>
+</div>
+<section id="nota-sobre-el-overfitting-observado">
+<h3>Nota sobre el overfitting observado<a class="headerlink" href="#nota-sobre-el-overfitting-observado" title="Link to this heading">#</a></h3>
+<p>Las curvas de entrenamiento muestran una brecha significativa entre train (~0.05 log-loss)
+y val (~0.87 log-loss), lo que indica overfitting. Sin embargo, se tomó la decisión de
+<strong>no continuar ajustando hiperparámetros ni aumentar epochs</strong> por las siguientes razones:</p>
+<ol class="arabic simple">
+<li><p><strong>El overfitting es estructural, no corregible con hiperparámetros simples.</strong>
+TF-IDF con 50,000 features sobre 1,738 muestras de train produce una matriz
+extremadamente sparse y de alta dimensionalidad. XGBoost con árboles profundos
+memoriza patrones espurios inevitablemente en este régimen.</p></li>
+<li><p><strong>Las métricas en test son competitivas.</strong> Accuracy 0.77 y ROC-AUC 0.98 sobre
+el conjunto test —visto una sola vez— indican que el modelo generaliza bien a pesar
+de la brecha en loss. El overfitting en log-loss no se traduce en overfitting
+severo en accuracy.</p></li>
+<li><p><strong>Los intentos de regularización empeoraron el entrenamiento.</strong> Al agregar
+<code class="docutils literal notranslate"><span class="pre">subsample</span></code> y <code class="docutils literal notranslate"><span class="pre">colsample_bytree</span></code>, el gradiente se volvió inestable con datos
+sparse (ver BUG-04 en knowledge base). La regularización vía L1/L2 (<code class="docutils literal notranslate"><span class="pre">reg_alpha</span></code>,
+<code class="docutils literal notranslate"><span class="pre">reg_lambda</span></code>) redujo marginalmente la brecha sin mejorar las métricas en test.</p></li>
+<li><p><strong>Este es el modelo baseline.</strong> Su propósito es establecer un punto de referencia,
+no ser el modelo óptimo. El análisis comparativo final evaluará si los modelos
+de deep learning (CNN-1D, BiLSTM, DistilBERT) cierran esta brecha de generalización
+gracias a sus embeddings densos y menor dependencia de features manuales.</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="evaluacion-sobre-test">
+<h2>8. Evaluación sobre Test<a class="headerlink" href="#evaluacion-sobre-test" title="Link to this heading">#</a></h2>
+<p>El modelo ajustado con val (via early stopping) se evalúa <strong>una sola vez</strong> sobre el conjunto test.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Predicciones ──────────────────────────────────────────────────────────────</span>
+<span class="n">y_pred_labels</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_tfidf</span><span class="p">)</span>                    <span class="c1"># clases predichas</span>
+<span class="n">y_pred_proba</span>  <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test_tfidf</span><span class="p">)</span>              <span class="c1"># probabilidades (373, 24)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y_pred_labels shape : </span><span class="si">{</span><span class="n">y_pred_labels</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y_pred_proba  shape : </span><span class="si">{</span><span class="n">y_pred_proba</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Suma de probabilidades fila 0: </span><span class="si">{</span><span class="n">y_pred_proba</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>y_pred_labels shape : (373,)
+y_pred_proba  shape : (373, 24)
+Suma de probabilidades fila 0: 1.000000
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Métricas escalares ────────────────────────────────────────────────────────</span>
+<span class="n">acc</span>       <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">)</span>
+<span class="n">f1_w</span>      <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">)</span>
+<span class="n">prec_w</span>    <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rec_w</span>     <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># ROC-AUC multiclase One-vs-Rest weighted</span>
+<span class="n">roc_auc_w</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span>
+    <span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_proba</span><span class="p">,</span>
+    <span class="n">multi_class</span><span class="o">=</span><span class="s1">&#39;ovr&#39;</span><span class="p">,</span>
+    <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MÉTRICAS FINALES — TEST SET&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Accuracy          : </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Precision weighted: </span><span class="si">{</span><span class="n">prec_w</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Recall weighted   : </span><span class="si">{</span><span class="n">rec_w</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  F1 weighted       : </span><span class="si">{</span><span class="n">f1_w</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ROC-AUC OvR w     : </span><span class="si">{</span><span class="n">roc_auc_w</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>==================================================
+MÉTRICAS FINALES — TEST SET
+==================================================
+  Accuracy          : 0.7748
+  Precision weighted: 0.7816
+  Recall weighted   : 0.7748
+  F1 weighted       : 0.7667
+  ROC-AUC OvR w     : 0.9808
+==================================================
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Reporte completo por clase ────────────────────────────────────────────────</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span>
+    <span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">,</span>
+    <span class="n">target_names</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+    <span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                        precision    recall  f1-score   support
+
+            ACCOUNTANT     0.5714    0.9412    0.7111        17
+              ADVOCATE     0.8421    0.9412    0.8889        17
+           AGRICULTURE     0.8000    0.4000    0.5333        10
+               APPAREL     0.8571    0.4286    0.5714        14
+                  ARTS     0.4000    0.3750    0.3871        16
+            AUTOMOBILE     0.3333    0.2000    0.2500         5
+              AVIATION     1.0000    0.8889    0.9412        18
+               BANKING     0.8462    0.6111    0.7097        18
+                   BPO     1.0000    0.5000    0.6667         4
+  BUSINESS-DEVELOPMENT     0.9000    1.0000    0.9474        18
+                  CHEF     0.9286    0.7647    0.8387        17
+          CONSTRUCTION     0.8824    0.8824    0.8824        17
+            CONSULTANT     0.7647    0.7222    0.7429        18
+              DESIGNER     0.8889    1.0000    0.9412        16
+         DIGITAL-MEDIA     0.6667    0.6667    0.6667        15
+           ENGINEERING     0.8824    0.8824    0.8824        17
+               FINANCE     0.6923    0.5000    0.5806        18
+               FITNESS     0.7895    0.8824    0.8333        17
+            HEALTHCARE     0.7500    0.8333    0.7895        18
+                    HR     0.7778    0.8750    0.8235        16
+INFORMATION-TECHNOLOGY     0.7391    0.9444    0.8293        18
+      PUBLIC-RELATIONS     0.8333    0.9375    0.8824        16
+                 SALES     0.6667    0.7059    0.6857        17
+               TEACHER     0.7778    0.8750    0.8235        16
+
+              accuracy                         0.7748       373
+             macro avg     0.7746    0.7399    0.7420       373
+          weighted avg     0.7816    0.7748    0.7667       373
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="visualizaciones-de-evaluacion">
+<h2>9. Visualizaciones de evaluación<a class="headerlink" href="#visualizaciones-de-evaluacion" title="Link to this heading">#</a></h2>
+<section id="matriz-de-confusion">
+<h3>9.1 Matriz de confusión<a class="headerlink" href="#matriz-de-confusion" title="Link to this heading">#</a></h3>
+<p>Con 24 clases, la matriz ocupa su propia figura con tamaño dinámico. Se muestran <strong>conteos absolutos</strong> y versión <strong>normalizada por filas</strong> (recall por clase) en paralelo.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">)</span>
+<span class="n">cm_norm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># normalizar por fila</span>
+
+<span class="c1"># Tamaño dinámico según número de clases</span>
+<span class="n">cell_size</span> <span class="o">=</span> <span class="mf">0.6</span>
+<span class="n">fig_side</span>  <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">NUM_CLASSES</span> <span class="o">*</span> <span class="n">cell_size</span><span class="p">)</span>
+
+<span class="c1"># Figura 1: conteos absolutos</span>
+<span class="n">fig1</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">fig_side</span><span class="p">,</span> <span class="n">fig_side</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s1">&#39;lightgray&#39;</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;shrink&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Matriz de Confusión — Conteos absolutos&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicción&#39;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>  <span class="c1"># aumenta el margen inferior</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Figura 2: normalizada</span>
+<span class="n">fig2</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">fig_side</span><span class="p">,</span> <span class="n">fig_side</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm_norm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Greens&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s1">&#39;lightgray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;shrink&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">})</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Matriz de Confusión — Normalizada por filas (Recall)&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicción&#39;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>  <span class="c1"># aumenta el margen inferior</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Clases con peor rendimiento</span>
+<span class="n">per_class_recall</span> <span class="o">=</span> <span class="n">cm_norm</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span>
+<span class="n">worst_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">per_class_recall</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Clases con menor recall:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">worst_idx</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">per_class_recall</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/4c1196dcb559bdcd10d13b818ab69f23a76b7952aa4e6954aaa5220caf6bbbbb.png" src="../../_images/4c1196dcb559bdcd10d13b818ab69f23a76b7952aa4e6954aaa5220caf6bbbbb.png" />
+<img alt="../../_images/f0389f4762829a8f5ec595e2e91564d17d51707e16ac2c7280346c79cec39a92.png" src="../../_images/f0389f4762829a8f5ec595e2e91564d17d51707e16ac2c7280346c79cec39a92.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clases con menor recall:
+  AUTOMOBILE               : 0.2000
+  ARTS                     : 0.3750
+  AGRICULTURE              : 0.4000
+  APPAREL                  : 0.4286
+  BPO                      : 0.5000
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="curva-roc-one-vs-rest-por-clase">
+<h3>9.2 Curva ROC — One-vs-Rest por clase<a class="headerlink" href="#curva-roc-one-vs-rest-por-clase" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Binarizar etiquetas para curvas OvR</span>
+<span class="n">y_test_bin</span> <span class="o">=</span> <span class="n">label_binarize</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">))</span>
+
+<span class="c1"># Calcular AUC por clase</span>
+<span class="n">fpr_dict</span><span class="p">,</span> <span class="n">tpr_dict</span><span class="p">,</span> <span class="n">roc_auc_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_pred_proba</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="c1"># Micro-average</span>
+<span class="n">fpr_micro</span><span class="p">,</span> <span class="n">tpr_micro</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test_bin</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y_pred_proba</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+<span class="n">roc_auc_micro</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">fpr_micro</span><span class="p">,</span> <span class="n">tpr_micro</span><span class="p">)</span>
+
+<span class="c1"># ── Plot ──────────────────────────────────────────────────────────────────────</span>
+<span class="n">n_cols</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">n_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">NUM_CLASSES</span> <span class="o">/</span> <span class="n">n_cols</span><span class="p">))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas ROC por clase — TF-IDF + XGBoost (OvR)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes_flat</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">AUC=</span><span class="si">{</span><span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;FPR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;TPR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Ocultar subplots vacíos</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes_flat</span><span class="p">)):</span>
+    <span class="n">axes_flat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ROC-AUC micro-average : </span><span class="si">{</span><span class="n">roc_auc_micro</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ROC-AUC weighted OvR  : </span><span class="si">{</span><span class="n">roc_auc_w</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/55193e45cb910c42f4e3da73e60a12e0afb7a0e1d1a2f0b6ebd3294cd3be3c62.png" src="../../_images/55193e45cb910c42f4e3da73e60a12e0afb7a0e1d1a2f0b6ebd3294cd3be3c62.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ROC-AUC micro-average : 0.9843
+ROC-AUC weighted OvR  : 0.9808
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="curva-precision-recall-one-vs-rest-por-clase">
+<h3>9.3 Curva Precision-Recall — One-vs-Rest por clase<a class="headerlink" href="#curva-precision-recall-one-vs-rest-por-clase" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calcular PR por clase</span>
+<span class="n">prec_dict</span><span class="p">,</span> <span class="n">rec_dict</span><span class="p">,</span> <span class="n">pr_auc_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span>
+        <span class="n">y_test_bin</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_pred_proba</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="c1"># ── Plot ──────────────────────────────────────────────────────────────────────</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas Precision-Recall por clase — TF-IDF + XGBoost (OvR)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes_flat</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="c1"># Baseline por clase (prevalencia en test)</span>
+<span class="n">class_prevalence</span> <span class="o">=</span> <span class="n">y_test_bin</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">class_prevalence</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">AP=</span><span class="si">{</span><span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Recall&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Precision&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes_flat</span><span class="p">)):</span>
+    <span class="n">axes_flat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">mean_ap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">pr_auc_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mAP (mean Average Precision): </span><span class="si">{</span><span class="n">mean_ap</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/5abc0b023250233c6f41bd5249c014d09ef1b7309cf9954cc74be396948f7a2f.png" src="../../_images/5abc0b023250233c6f41bd5249c014d09ef1b7309cf9954cc74be396948f7a2f.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mAP (mean Average Precision): 0.8039
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="f1-por-clase-barplot-comparativo">
+<h3>9.4 F1 por clase — barplot comparativo<a class="headerlink" href="#f1-por-clase-barplot-comparativo" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f1_per_class</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">sorted_idx</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">f1_per_class</span><span class="p">)</span>
+<span class="n">sorted_f1</span>   <span class="o">=</span> <span class="n">f1_per_class</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
+<span class="n">sorted_names</span> <span class="o">=</span> <span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tomato&#39;</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="s1">&#39;steelblue&#39;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_f1</span><span class="p">]</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">),</span> <span class="n">sorted_f1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">sorted_names</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;F1-score&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;F1-score por clase — TF-IDF + XGBoost (Test)&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">f1_w</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;F1 weighted: </span><span class="si">{</span><span class="n">f1_w</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Anotar valores</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">sorted_f1</span><span class="p">)):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">val</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/44f9aa3cff54da30958f9db1f524a41f71c29e8a1a2a6da45d29528fe0b261d2.png" src="../../_images/44f9aa3cff54da30958f9db1f524a41f71c29e8a1a2a6da45d29528fe0b261d2.png" />
+</div>
+</div>
+</section>
+<section id="importancia-de-features-top-terminos-tf-idf">
+<h3>9.5 Importancia de features (Top términos TF-IDF)<a class="headerlink" href="#importancia-de-features-top-terminos-tf-idf" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Feature importance del modelo XGBoost</span>
+<span class="n">importances</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">feature_importances_</span>
+<span class="n">feature_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tfidf</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">())</span>
+
+<span class="n">top_n</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">top_idx</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">importances</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="n">top_n</span><span class="p">]</span>
+<span class="n">top_names</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">top_idx</span><span class="p">]</span>
+<span class="n">top_vals</span>  <span class="o">=</span> <span class="n">importances</span><span class="p">[</span><span class="n">top_idx</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">top_n</span><span class="p">),</span> <span class="n">top_vals</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">top_n</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">top_names</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Importancia (gain)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Top </span><span class="si">{</span><span class="n">top_n</span><span class="si">}</span><span class="s1"> términos TF-IDF más importantes — XGBoost&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/ffa5c09b382ea337f8df2855e9a54a8e050226546288c7a8cc9a7320608025ca.png" src="../../_images/ffa5c09b382ea337f8df2855e9a54a8e050226546288c7a8cc9a7320608025ca.png" />
+</div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="guardar-modelo-y-metricas">
+<h2>10. Guardar modelo y métricas<a class="headerlink" href="#guardar-modelo-y-metricas" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Guardar modelo XGBoost ────────────────────────────────────────────────────</span>
+<span class="n">model</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modelo guardado en: </span><span class="si">{</span><span class="n">MODEL_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># ── Guardar vectorizador TF-IDF ───────────────────────────────────────────────</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">TFIDF_PATH</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">tfidf</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TF-IDF guardado en : </span><span class="si">{</span><span class="n">TFIDF_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Modelo guardado en: /home/alejo/DeepLearning/miniproyecto3/models/tfidf_xgboost.json
+TF-IDF guardado en : /home/alejo/DeepLearning/miniproyecto3/models/tfidf_xgboost_tfidf.pkl
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Construir y guardar JSON de métricas ──────────────────────────────────────</span>
+<span class="n">report_dict</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span>
+    <span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_labels</span><span class="p">,</span>
+    <span class="n">target_names</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+    <span class="n">output_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+
+<span class="c1"># TFIDF_PARAMS tiene dtype=np.float32 que no es serializable — convertir a string</span>
+<span class="n">tfidf_params_serializable</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">TFIDF_PARAMS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="n">metrics_payload</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model_name&quot;</span>   <span class="p">:</span> <span class="s2">&quot;TF-IDF + XGBoost&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;notebook&quot;</span>     <span class="p">:</span> <span class="s2">&quot;02_Model_TFIDF_XGBoost.ipynb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timestamp&quot;</span>    <span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="s2">&quot;hyperparameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;tfidf&quot;</span><span class="p">:</span> <span class="n">tfidf_params_serializable</span><span class="p">,</span>
+        <span class="s2">&quot;xgboost&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">XGB_PARAMS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;eval_metric&#39;</span><span class="p">,</span> <span class="s1">&#39;objective&#39;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;best_iteration&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">best_round</span><span class="p">),</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">DEVICE</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;accuracy&quot;</span>              <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">acc</span><span class="p">),</span>
+        <span class="s2">&quot;precision_weighted&quot;</span>    <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">prec_w</span><span class="p">),</span>
+        <span class="s2">&quot;recall_weighted&quot;</span>       <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">rec_w</span><span class="p">),</span>
+        <span class="s2">&quot;f1_weighted&quot;</span>           <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">f1_w</span><span class="p">),</span>
+        <span class="s2">&quot;roc_auc_ovr_weighted&quot;</span>  <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_w</span><span class="p">),</span>
+        <span class="s2">&quot;roc_auc_micro&quot;</span>         <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_micro</span><span class="p">),</span>
+        <span class="s2">&quot;mean_average_precision&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">mean_ap</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;per_class&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;precision&quot;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">report_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;precision&#39;</span><span class="p">]),</span>
+            <span class="s2">&quot;recall&quot;</span>    <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">report_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;recall&#39;</span><span class="p">]),</span>
+            <span class="s2">&quot;f1&quot;</span>        <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">report_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;f1-score&#39;</span><span class="p">]),</span>
+            <span class="s2">&quot;support&quot;</span>   <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">report_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;support&#39;</span><span class="p">]),</span>
+            <span class="s2">&quot;roc_auc&quot;</span>   <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+            <span class="s2">&quot;pr_auc&quot;</span>    <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">CLASS_NAMES</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;training_time_seconds&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">training_time</span><span class="p">),</span>
+    <span class="s2">&quot;tfidf_time_seconds&quot;</span>   <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">tfidf_time</span><span class="p">),</span>
+    <span class="s2">&quot;data_sizes&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)),</span>
+        <span class="s2">&quot;val&quot;</span>  <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">)),</span>
+        <span class="s2">&quot;test&quot;</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">METRICS_PATH</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metrics_payload</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Métricas guardadas en: </span><span class="si">{</span><span class="n">METRICS_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Resumen final:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics_payload</span><span class="p">[</span><span class="s1">&#39;metrics&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Métricas guardadas en: /home/alejo/DeepLearning/miniproyecto3/artifacts/metrics/tfidf_xgboost.json
+
+Resumen final:
+  accuracy                      : 0.7748
+  precision_weighted            : 0.7816
+  recall_weighted               : 0.7748
+  f1_weighted                   : 0.7667
+  roc_auc_ovr_weighted          : 0.9808
+  roc_auc_micro                 : 0.9843
+  mean_average_precision        : 0.8039
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="resumen-del-modelo">
+<h2>11. Resumen del modelo<a class="headerlink" href="#resumen-del-modelo" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Componente</p></th>
+<th class="head"><p>Detalle</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Vectorizador</p></td>
+<td><p>TF-IDF, max_features=50k, unigramas+bigramas, sublinear_tf</p></td>
+</tr>
+<tr class="row-odd"><td><p>Clasificador</p></td>
+<td><p>XGBoost multiclase (<code class="docutils literal notranslate"><span class="pre">multi:softprob</span></code>), early stopping</p></td>
+</tr>
+<tr class="row-even"><td><p>Desbalance</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> balanceado en train</p></td>
+</tr>
+<tr class="row-odd"><td><p>Validación</p></td>
+<td><p>eval_set con val, early stopping patience=20 rondas</p></td>
+</tr>
+<tr class="row-even"><td><p>Evaluación</p></td>
+<td><p>Test set — una sola evaluación final</p></td>
+</tr>
+<tr class="row-odd"><td><p>Métricas</p></td>
+<td><p>Todas <code class="docutils literal notranslate"><span class="pre">weighted</span></code> por desbalance 5.45x</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Ventaja de TF-IDF vs embeddings:</strong> usa el texto completo (584 palabras promedio), mientras que CNN-1D y BiLSTM truncan a MAX_LEN=100 tokens (~17% del contenido real). Esto puede darle una ventaja injusta al baseline — tener en cuenta en el análisis crítico final.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/nlp"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01_EDA_NLP_Resume.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Bloque 2 - NLP: EDA y Preprocesamiento</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03_Model_CNN1D.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">03 — CNN-1D para Clasificación de Texto</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#descripcion">Descripción</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-y-configuracion">1. Imports y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rutas-y-directorios">2. Rutas y directorios</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-datos-y-artefactos-del-eda">3. Carga de datos y artefactos del EDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vectorizacion-tf-idf">4. Vectorización TF-IDF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manejo-del-desbalance-de-clases">5. Manejo del desbalance de clases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento-xgboost">6. Entrenamiento XGBoost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-de-entrenamiento">7. Curvas de entrenamiento</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nota-sobre-el-overfitting-observado">Nota sobre el overfitting observado</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluacion-sobre-test">8. Evaluación sobre Test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizaciones-de-evaluacion">9. Visualizaciones de evaluación</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-confusion">9.1 Matriz de confusión</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-roc-one-vs-rest-por-clase">9.2 Curva ROC — One-vs-Rest por clase</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-precision-recall-one-vs-rest-por-clase">9.3 Curva Precision-Recall — One-vs-Rest por clase</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#f1-por-clase-barplot-comparativo">9.4 F1 por clase — barplot comparativo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#importancia-de-features-top-terminos-tf-idf">9.5 Importancia de features (Top términos TF-IDF)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardar-modelo-y-metricas">10. Guardar modelo y métricas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resumen-del-modelo">11. Resumen del modelo</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mateo Gomez, Mateo Molinares, David Ibañez y Alejandro Moya
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,873 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Miniproyecto NLP — Clasificación Automática de Currículos &#8212; Deep Learning: Segmentación de Células e Interpretación de Texto</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'README';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Deep Learning: Segmentación de Células e Interpretación de Texto
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 1 — Segmentación de Imágenes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/01_EDA.html">Analisis Exploratorio de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/02_preprocesamiento_sartorius.html">Preprocesamiento para Modelado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/03_modelado_sartorius_cellpose.html">Modelado — Sartorius Cell Instance Segmentation-Cellpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/04_modelado_sartorius_OPTIMIZADO.html">04 — Modelado Sartorius · OPTIMIZADO para Colab Pro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/05_hover-net.html">Modelado — HoVer-Net</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/06_mask_rcnn.html">Modelado — Mask R-CNN con Swin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/vision/07_evaluacion_final.html">Evaluación Final — Sartorius Cell Instance Segmentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 2 — NLP</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/01_EDA_NLP_Resume.html">Bloque 2 - NLP: EDA y Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/02_Model_TFIDF_XGBoost.html">02 — Modelo Baseline: TF-IDF + XGBoost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/03_Model_CNN1D.html">03 — CNN-1D para Clasificación de Texto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/04_Model_BiLSTM.html">04 — Word2Vec + BiLSTM con Keras Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/05_Model_FastText.html">05 — Modelo FastText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/06_Model_DistilBERT.html">06 — DistilBERT Fine-tuning para Clasificación de Currículos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/nlp/07_Comparacion_Modelos.html">07 — Comparación de Modelos y Análisis Crítico</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/README.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Miniproyecto NLP — Clasificación Automática de Currículos</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-de-contenidos">Tabla de contenidos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset">Dataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clases-24">Clases (24)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#split">Split</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resultados-comparativos">Resultados comparativos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estructura-del-proyecto">Estructura del proyecto</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#instalacion-y-reproduccion">Instalación y reproducción</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requisitos">Requisitos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crear-el-entorno">Crear el entorno</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#correr-los-notebooks-en-orden">Correr los notebooks en orden</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correr-la-api">Correr la API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#localmente">Localmente</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#endpoints">Endpoints</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decisiones-tecnicas-importantes">Decisiones técnicas importantes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-leakage-tokenizador-y-vectorizador">Data leakage — tokenizador y vectorizador</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#max-len-100-para-modelos-keras">MAX_LEN = 100 para modelos Keras</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xgboost-subsample-y-colsample-bytree-fijados-en-1-0">XGBoost — subsample y colsample_bytree fijados en 1.0</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distilbert-carga-de-pesos">DistilBERT — carga de pesos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#desbalance-de-clases">Desbalance de clases</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mlops-docker">MLOps — Docker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#monitoreo-conceptual">Monitoreo conceptual</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="miniproyecto-nlp-clasificacion-automatica-de-curriculos">
+<h1>Miniproyecto NLP — Clasificación Automática de Currículos<a class="headerlink" href="#miniproyecto-nlp-clasificacion-automatica-de-curriculos" title="Link to this heading">#</a></h1>
+<p><strong>Autores:</strong> Alejandro Moya, Mateo Gomez, Mateo Molinares, David Ibañez
+<strong>Entorno:</strong> Python 3.10 · WSL2 Ubuntu · Conda <code class="docutils literal notranslate"><span class="pre">tf_gpu</span></code> · GPU RTX 4050 Laptop (6 GB VRAM)</p>
+<p>Proyecto integrador de aprendizaje automático para la <strong>clasificación automática de currículos en 24 categorías profesionales</strong>, usando el dataset <a class="reference external" href="https://www.kaggle.com/">Jarvis Calling Hiring Contest</a> de Kaggle. Incluye pipeline reproducible, comparación de cinco modelos de NLP y despliegue básico como API REST.</p>
+<hr class="docutils" />
+<section id="tabla-de-contenidos">
+<h2>Tabla de contenidos<a class="headerlink" href="#tabla-de-contenidos" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#dataset"><span class="xref myst">Dataset</span></a></p></li>
+<li><p><a class="reference internal" href="#resultados-comparativos"><span class="xref myst">Resultados comparativos</span></a></p></li>
+<li><p><a class="reference internal" href="#estructura-del-proyecto"><span class="xref myst">Estructura del proyecto</span></a></p></li>
+<li><p><a class="reference internal" href="#instalaci%C3%B3n-y-reproducci%C3%B3n"><span class="xref myst">Instalación y reproducción</span></a></p></li>
+<li><p><a class="reference internal" href="#correr-la-api"><span class="xref myst">Correr la API</span></a></p></li>
+<li><p><a class="reference internal" href="#decisiones-t%C3%A9cnicas-importantes"><span class="xref myst">Decisiones técnicas importantes</span></a></p></li>
+<li><p><a class="reference internal" href="#mlops--docker"><span class="xref myst">MLOps — Docker</span></a></p></li>
+<li><p><a class="reference internal" href="#monitoreo-conceptual"><span class="xref myst">Monitoreo conceptual</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Archivo:</strong> <code class="docutils literal notranslate"><span class="pre">data/Resume.csv</span></code></p></li>
+<li><p><strong>Dimensiones:</strong> 2,484 currículos × 4 columnas</p></li>
+<li><p><strong>Columna de entrada:</strong> <code class="docutils literal notranslate"><span class="pre">Resume_str</span></code> (texto crudo del CV)</p></li>
+<li><p><strong>Columna objetivo:</strong> <code class="docutils literal notranslate"><span class="pre">Category</span></code> (24 clases profesionales)</p></li>
+<li><p><strong>Desbalance:</strong> ratio máx/mín de 5.45x (120 muestras en IT vs 22 en BPO)</p></li>
+</ul>
+<section id="clases-24">
+<h3>Clases (24)<a class="headerlink" href="#clases-24" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">ACCOUNTANT</span></code> · <code class="docutils literal notranslate"><span class="pre">ADVOCATE</span></code> · <code class="docutils literal notranslate"><span class="pre">AGRICULTURE</span></code> · <code class="docutils literal notranslate"><span class="pre">APPAREL</span></code> · <code class="docutils literal notranslate"><span class="pre">ARTS</span></code> · <code class="docutils literal notranslate"><span class="pre">AUTOMOBILE</span></code> · <code class="docutils literal notranslate"><span class="pre">AVIATION</span></code> · <code class="docutils literal notranslate"><span class="pre">BANKING</span></code> · <code class="docutils literal notranslate"><span class="pre">BPO</span></code> · <code class="docutils literal notranslate"><span class="pre">BUSINESS-DEVELOPMENT</span></code> · <code class="docutils literal notranslate"><span class="pre">CHEF</span></code> · <code class="docutils literal notranslate"><span class="pre">CONSTRUCTION</span></code> · <code class="docutils literal notranslate"><span class="pre">CONSULTANT</span></code> · <code class="docutils literal notranslate"><span class="pre">DESIGNER</span></code> · <code class="docutils literal notranslate"><span class="pre">DIGITAL-MEDIA</span></code> · <code class="docutils literal notranslate"><span class="pre">ENGINEERING</span></code> · <code class="docutils literal notranslate"><span class="pre">FINANCE</span></code> · <code class="docutils literal notranslate"><span class="pre">FITNESS</span></code> · <code class="docutils literal notranslate"><span class="pre">HEALTHCARE</span></code> · <code class="docutils literal notranslate"><span class="pre">HR</span></code> · <code class="docutils literal notranslate"><span class="pre">INFORMATION-TECHNOLOGY</span></code> · <code class="docutils literal notranslate"><span class="pre">PUBLIC-RELATIONS</span></code> · <code class="docutils literal notranslate"><span class="pre">SALES</span></code> · <code class="docutils literal notranslate"><span class="pre">TEACHER</span></code></p>
+</section>
+<section id="split">
+<h3>Split<a class="headerlink" href="#split" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Conjunto</p></th>
+<th class="head"><p>Proporción</p></th>
+<th class="head"><p>Muestras</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Train</p></td>
+<td><p>70%</p></td>
+<td><p>1,738</p></td>
+</tr>
+<tr class="row-odd"><td><p>Validation</p></td>
+<td><p>15%</p></td>
+<td><p>373</p></td>
+</tr>
+<tr class="row-even"><td><p>Test</p></td>
+<td><p>15%</p></td>
+<td><p>373</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Split estratificado con <code class="docutils literal notranslate"><span class="pre">random_state=42</span></code>. El tokenizador/vectorizador se fittea <strong>solo sobre train</strong> para evitar data leakage.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resultados-comparativos">
+<h2>Resultados comparativos<a class="headerlink" href="#resultados-comparativos" title="Link to this heading">#</a></h2>
+<p>Todas las métricas reportadas sobre el conjunto <strong>test</strong> (visto una sola vez). Promedio <code class="docutils literal notranslate"><span class="pre">weighted</span></code> por el desbalance de clases.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Modelo</p></th>
+<th class="head"><p>Accuracy</p></th>
+<th class="head"><p>Precision</p></th>
+<th class="head"><p>Recall</p></th>
+<th class="head"><p>F1</p></th>
+<th class="head"><p>ROC-AUC</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TF-IDF + XGBoost</p></td>
+<td><p>0.7748</p></td>
+<td><p>0.7816</p></td>
+<td><p>0.7748</p></td>
+<td><p>0.7667</p></td>
+<td><p>0.9808</p></td>
+</tr>
+<tr class="row-odd"><td><p>CNN-1D</p></td>
+<td><p>0.6917</p></td>
+<td><p>0.6582</p></td>
+<td><p>0.6917</p></td>
+<td><p>0.6589</p></td>
+<td><p>0.9438</p></td>
+</tr>
+<tr class="row-even"><td><p>Word2Vec + BiLSTM</p></td>
+<td><p>0.7560</p></td>
+<td><p>0.7427</p></td>
+<td><p>0.7560</p></td>
+<td><p>0.7396</p></td>
+<td><p>0.9574</p></td>
+</tr>
+<tr class="row-odd"><td><p>FastText</p></td>
+<td><p>0.6461</p></td>
+<td><p>0.6399</p></td>
+<td><p>0.6461</p></td>
+<td><p>0.6346</p></td>
+<td><p>0.9473</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>DistilBERT fine-tuned</strong></p></td>
+<td><p><strong>0.8016</strong></p></td>
+<td><p><strong>0.7850</strong></p></td>
+<td><p><strong>0.8016</strong></p></td>
+<td><p><strong>0.7899</strong></p></td>
+<td><p><strong>0.9746</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Mejor modelo:</strong> DistilBERT fine-tuned (F1 = 0.7899, ROC-AUC = 0.9746).<br />
+<strong>Mejor modelo clásico:</strong> TF-IDF + XGBoost — solo 0.023 de F1 por debajo de DistilBERT, con una fracción del costo computacional.<br />
+<strong>Modelo en producción (API):</strong> TF-IDF + XGBoost — liviano, sin dependencia de GPU, carga en &lt; 1 segundo.</p>
+</section>
+<hr class="docutils" />
+<section id="estructura-del-proyecto">
+<h2>Estructura del proyecto<a class="headerlink" href="#estructura-del-proyecto" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>miniproyecto3/
+├── data/
+│   └── Resume.csv                    # Dataset original
+│
+├── notebook/
+│   ├── 01_EDA_NLP_Resume.ipynb       # Análisis exploratorio de datos
+│   ├── 02_Model_TFIDF_XGBoost.ipynb  # Baseline: TF-IDF + XGBoost
+│   ├── 03_Model_CNN1D.ipynb          # CNN-1D con embeddings entrenables
+│   ├── 04_Model_BiLSTM.ipynb         # Word2Vec + BiLSTM + Keras Tuner
+│   ├── 05_Model_FastText.ipynb       # FastText nativo (fasttext-numpy2)
+│   ├── 06_Model_DistilBERT.ipynb     # DistilBERT fine-tuning (TF)
+│   └── 07_Comparacion_Modelos.ipynb  # Tabla comparativa y análisis crítico
+│
+├── artifacts/
+│   ├── tokenizer.pkl                 # Keras Tokenizer (fit solo sobre train)
+│   ├── label_encoder.pkl             # LabelEncoder — 24 clases
+│   ├── config.pkl                    # MAX_LEN=100, VOCAB_SIZE=20000, NUM_CLASSES=24
+│   ├── X_train.npy / X_val.npy / X_test.npy   # Secuencias padded
+│   ├── y_train.npy / y_val.npy / y_test.npy   # Etiquetas codificadas
+│   ├── fasttext_tmp/                 # Archivos .txt para FastText
+│   └── metrics/                      # JSON de métricas por modelo
+│       ├── tfidf_xgboost.json
+│       ├── cnn1d_metrics.json
+│       ├── bilstm_metrics.json
+│       ├── fasttext_metrics.json
+│       └── distilbert_metrics.json
+│
+├── models/
+│   ├── tfidf_xgboost.json            # Modelo XGBoost (formato nativo)
+│   ├── tfidf_xgboost_tfidf.pkl       # Vectorizador TF-IDF
+│   ├── cnn1d_model.keras
+│   ├── bilstm_w2v.keras
+│   ├── fasttext_model.bin
+│   └── distilbert_classifier.keras
+│
+├── app/
+│   ├── main.py                       # Servidor FastAPI
+│   ├── predictor.py                  # Carga de modelos y lógica de predicción
+│   └── schemas.py                    # Modelos Pydantic (input/output)
+│
+├── Dockerfile
+├── requirements.txt
+└── README.md
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="instalacion-y-reproduccion">
+<h2>Instalación y reproducción<a class="headerlink" href="#instalacion-y-reproduccion" title="Link to this heading">#</a></h2>
+<section id="requisitos">
+<h3>Requisitos<a class="headerlink" href="#requisitos" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Miniconda o Anaconda</p></li>
+<li><p>Python 3.10</p></li>
+<li><p>GPU con CUDA (opcional — los notebooks de Keras y XGBoost lo detectan automáticamente)</p></li>
+</ul>
+</section>
+<section id="crear-el-entorno">
+<h3>Crear el entorno<a class="headerlink" href="#crear-el-entorno" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>tf_gpu<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10
+conda<span class="w"> </span>activate<span class="w"> </span>tf_gpu
+pip<span class="w"> </span>install<span class="w"> </span>tensorflow<span class="o">[</span>and-cuda<span class="o">]</span><span class="w"> </span>xgboost<span class="w"> </span>scikit-learn<span class="w"> </span>gensim<span class="w"> </span>nltk<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>fasttext-numpy2<span class="w"> </span><span class="nv">transformers</span><span class="o">==</span><span class="m">4</span>.35.2<span class="w"> </span><span class="nv">tokenizers</span><span class="o">==</span><span class="m">0</span>.15.2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>huggingface_hub<span class="w"> </span>keras-tuner<span class="w"> </span>--no-deps<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>matplotlib<span class="w"> </span>seaborn<span class="w"> </span>wordcloud<span class="w"> </span>pandas<span class="w"> </span>numpy<span class="w"> </span>jupyter
+</pre></div>
+</div>
+</section>
+<section id="correr-los-notebooks-en-orden">
+<h3>Correr los notebooks en orden<a class="headerlink" href="#correr-los-notebooks-en-orden" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>miniproyecto3/
+jupyter<span class="w"> </span>notebook
+</pre></div>
+</div>
+<p>Ejecutar en este orden:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Notebook</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>01</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">01_EDA_NLP_Resume.ipynb</span></code></p></td>
+<td><p>EDA — genera artefactos en <code class="docutils literal notranslate"><span class="pre">artifacts/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>02</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">02_Model_TFIDF_XGBoost.ipynb</span></code></p></td>
+<td><p>Baseline — genera <code class="docutils literal notranslate"><span class="pre">models/tfidf_xgboost.*</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>03</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">03_Model_CNN1D.ipynb</span></code></p></td>
+<td><p>CNN-1D</p></td>
+</tr>
+<tr class="row-odd"><td><p>04</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">04_Model_BiLSTM.ipynb</span></code></p></td>
+<td><p>BiLSTM con Keras Tuner</p></td>
+</tr>
+<tr class="row-even"><td><p>05</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">05_Model_FastText.ipynb</span></code></p></td>
+<td><p>FastText nativo</p></td>
+</tr>
+<tr class="row-odd"><td><p>06</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">06_Model_DistilBERT.ipynb</span></code></p></td>
+<td><p>DistilBERT fine-tuning</p></td>
+</tr>
+<tr class="row-even"><td><p>07</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">07_Comparacion_Modelos.ipynb</span></code></p></td>
+<td><p>Comparación final y análisis crítico</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<div><p><strong>Importante:</strong> El notebook 06 requiere <code class="docutils literal notranslate"><span class="pre">TF_USE_LEGACY_KERAS=1</span></code> como primera línea absoluta antes de cualquier import. Los demás notebooks no deben setearlo.</p>
+</div></blockquote>
+</section>
+</section>
+<hr class="docutils" />
+<section id="correr-la-api">
+<h2>Correr la API<a class="headerlink" href="#correr-la-api" title="Link to this heading">#</a></h2>
+<p>La API usa el modelo <strong>TF-IDF + XGBoost</strong> — sin GPU, sin TensorFlow, carga en &lt; 1 segundo.</p>
+<section id="localmente">
+<h3>Localmente<a class="headerlink" href="#localmente" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>tf_gpu
+<span class="nb">cd</span><span class="w"> </span>miniproyecto3/
+uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--reload
+</pre></div>
+</div>
+<p>La API queda disponible en <code class="docutils literal notranslate"><span class="pre">http://localhost:8000</span></code>.<br />
+Documentación interactiva (Swagger UI): <code class="docutils literal notranslate"><span class="pre">http://localhost:8000/docs</span></code></p>
+</section>
+<section id="endpoints">
+<h3>Endpoints<a class="headerlink" href="#endpoints" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Método</p></th>
+<th class="head"><p>Ruta</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
+<td><p>Información básica de la API</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/health</span></code></p></td>
+<td><p>Estado del servidor y modelo cargado</p></td>
+</tr>
+<tr class="row-even"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predict_text</span></code></p></td>
+<td><p>Clasificar un currículo</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ejemplo-de-uso">
+<h3>Ejemplo de uso<a class="headerlink" href="#ejemplo-de-uso" title="Link to this heading">#</a></h3>
+<p><strong>Request:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://localhost:8000/predict_text&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;text&quot;: &quot;Python developer with 8 years of experience. Proficient in Django, REST APIs, PostgreSQL and AWS. Led development of microservices architecture.&quot;}&#39;</span>
+</pre></div>
+</div>
+<p><strong>Response:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFORMATION-TECHNOLOGY&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9423</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;top_3&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFORMATION-TECHNOLOGY&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9423</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ENGINEERING&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0312</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CONSULTANT&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0089</span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Nota:</strong> El modelo fue entrenado con CVs completos (promedio 584 palabras limpias). Con textos muy cortos o genéricos, la confianza cae y las predicciones son menos confiables — comportamiento esperado en TF-IDF sin contexto semántico.</p>
+</div></blockquote>
+</section>
+</section>
+<hr class="docutils" />
+<section id="decisiones-tecnicas-importantes">
+<h2>Decisiones técnicas importantes<a class="headerlink" href="#decisiones-tecnicas-importantes" title="Link to this heading">#</a></h2>
+<section id="data-leakage-tokenizador-y-vectorizador">
+<h3>Data leakage — tokenizador y vectorizador<a class="headerlink" href="#data-leakage-tokenizador-y-vectorizador" title="Link to this heading">#</a></h3>
+<p>El <code class="docutils literal notranslate"><span class="pre">Tokenizer</span></code> de Keras y el <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code> se fittean <strong>solo sobre el conjunto train</strong>, luego se aplican a val y test. El split de índices se hace primero, el fit después. El <code class="docutils literal notranslate"><span class="pre">LabelEncoder</span></code> sí puede fitearse sobre todas las etiquetas porque solo aprende nombres de clases.</p>
+</section>
+<section id="max-len-100-para-modelos-keras">
+<h3>MAX_LEN = 100 para modelos Keras<a class="headerlink" href="#max-len-100-para-modelos-keras" title="Link to this heading">#</a></h3>
+<p>Los textos limpios promedian 584 palabras con un P95 de 1,008. Se seleccionó MAX_LEN=100 por restricciones de VRAM (RTX 4050, 6 GB). Aumentar a 300-500 habría incrementado la capacidad del modelo sin garantía de mejor generalización — el cuello de botella es el volumen de datos (1,738 muestras de train), no la longitud del contexto.</p>
+</section>
+<section id="xgboost-subsample-y-colsample-bytree-fijados-en-1-0">
+<h3>XGBoost — subsample y colsample_bytree fijados en 1.0<a class="headerlink" href="#xgboost-subsample-y-colsample-bytree-fijados-en-1-0" title="Link to this heading">#</a></h3>
+<p>Con matrices TF-IDF sparse de alta dimensionalidad (50,000 features), reducir <code class="docutils literal notranslate"><span class="pre">subsample</span></code> o <code class="docutils literal notranslate"><span class="pre">colsample_bytree</span></code> destabiliza el gradiente. La regularización se maneja vía L1/L2 (<code class="docutils literal notranslate"><span class="pre">reg_alpha=1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">reg_lambda=5.0</span></code>).</p>
+</section>
+<section id="distilbert-carga-de-pesos">
+<h3>DistilBERT — carga de pesos<a class="headerlink" href="#distilbert-carga-de-pesos" title="Link to this heading">#</a></h3>
+<p>Las clases <code class="docutils literal notranslate"><span class="pre">TF*</span></code> de HuggingFace son incompatibles con Keras 3.x. Se usa <code class="docutils literal notranslate"><span class="pre">TFDistilBertModel</span></code> (backbone directo) con pesos cargados desde <code class="docutils literal notranslate"><span class="pre">tf_model.h5</span></code> descargado con <code class="docutils literal notranslate"><span class="pre">hf_hub_download</span></code>, evitando la conversión PyTorch → TF de transformers. Requiere <code class="docutils literal notranslate"><span class="pre">transformers==4.35.2</span></code>.</p>
+</section>
+<section id="desbalance-de-clases">
+<h3>Desbalance de clases<a class="headerlink" href="#desbalance-de-clases" title="Link to this heading">#</a></h3>
+<p>Ratio máx/mín de 5.45x. Se descartó <code class="docutils literal notranslate"><span class="pre">class_weight</span></code> en Keras y <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> en XGBoost por inestabilidad del entrenamiento. Todas las métricas se reportan en modo <code class="docutils literal notranslate"><span class="pre">weighted</span></code> para evaluación justa entre clases mayoritarias y minoritarias.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="mlops-docker">
+<h2>MLOps — Docker<a class="headerlink" href="#mlops-docker" title="Link to this heading">#</a></h2>
+<p>La API está containerizada. Para construir y correr el contenedor:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Construir la imagen</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>nlp-resume-api<span class="w"> </span>.
+
+<span class="c1"># Correr el contenedor</span>
+docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span>:8000<span class="w"> </span>nlp-resume-api
+</pre></div>
+</div>
+<p>El <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> usa <code class="docutils literal notranslate"><span class="pre">python:3.10-slim</span></code> e incluye solo las dependencias necesarias para la API (sin TensorFlow, sin librerías de notebooks). Los modelos y artefactos se copian al contenedor en tiempo de build.</p>
+</section>
+<hr class="docutils" />
+<section id="monitoreo-conceptual">
+<h2>Monitoreo conceptual<a class="headerlink" href="#monitoreo-conceptual" title="Link to this heading">#</a></h2>
+<p>En un entorno de producción real, se monitorearían los siguientes aspectos:</p>
+<p><strong>Data drift:</strong> comparar la distribución del vocabulario de los textos entrantes con la distribución del set de entrenamiento. Un aumento en tokens OOV (fuera del vocabulario TF-IDF) o cambios en la longitud promedio de los textos pueden indicar drift. Herramientas: Evidently AI, WhyLogs.</p>
+<p><strong>Métricas en producción:</strong> registrar la confianza promedio por predicción y la distribución de categorías predichas. Una caída sostenida en la confianza o una distribución muy diferente a la del test pueden indicar degradación del modelo.</p>
+<p><strong>Latencia:</strong> monitorear el tiempo de respuesta del endpoint <code class="docutils literal notranslate"><span class="pre">/predict_text</span></code>. Con TF-IDF + XGBoost se espera latencia &lt; 100ms por request en CPU. Alertar si supera 500ms sostenidamente.</p>
+<p><strong>Reentrenamiento:</strong> evaluar reentrenamiento periódico si se acumulan suficientes ejemplos con etiquetas corregidas por humanos o si las métricas en producción se degradan más del 5% respecto al baseline de test.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-de-contenidos">Tabla de contenidos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset">Dataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clases-24">Clases (24)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#split">Split</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resultados-comparativos">Resultados comparativos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estructura-del-proyecto">Estructura del proyecto</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#instalacion-y-reproduccion">Instalación y reproducción</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requisitos">Requisitos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crear-el-entorno">Crear el entorno</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#correr-los-notebooks-en-orden">Correr los notebooks en orden</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correr-la-api">Correr la API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#localmente">Localmente</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#endpoints">Endpoints</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ejemplo-de-uso">Ejemplo de uso</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decisiones-tecnicas-importantes">Decisiones técnicas importantes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-leakage-tokenizador-y-vectorizador">Data leakage — tokenizador y vectorizador</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#max-len-100-para-modelos-keras">MAX_LEN = 100 para modelos Keras</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xgboost-subsample-y-colsample-bytree-fijados-en-1-0">XGBoost — subsample y colsample_bytree fijados en 1.0</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distilbert-carga-de-pesos">DistilBERT — carga de pesos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#desbalance-de-clases">Desbalance de clases</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mlops-docker">MLOps — Docker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#monitoreo-conceptual">Monitoreo conceptual</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mateo Gomez, Mateo Molinares, David Ibañez y Alejandro Moya
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

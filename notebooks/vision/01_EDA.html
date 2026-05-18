@@ -1,0 +1,1603 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Analisis Exploratorio de datos &#8212; Deep Learning: Segmentación de Células e Interpretación de Texto</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/vision/01_EDA';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Preprocesamiento para Modelado" href="02_preprocesamiento_sartorius.html" />
+    <link rel="prev" title="Deep Learning: Segmentación de Células e Interpretación de Texto" href="../../intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Deep Learning: Segmentación de Células e Interpretación de Texto
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 1 — Segmentación de Imágenes</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Analisis Exploratorio de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_preprocesamiento_sartorius.html">Preprocesamiento para Modelado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_modelado_sartorius_cellpose.html">Modelado — Sartorius Cell Instance Segmentation-Cellpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_modelado_sartorius_OPTIMIZADO.html">04 — Modelado Sartorius · OPTIMIZADO para Colab Pro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_hover-net.html">Modelado — HoVer-Net</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_mask_rcnn.html">Modelado — Mask R-CNN con Swin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_evaluacion_final.html">Evaluación Final — Sartorius Cell Instance Segmentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 2 — NLP</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../nlp/01_EDA_NLP_Resume.html">Bloque 2 - NLP: EDA y Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/02_Model_TFIDF_XGBoost.html">02 — Modelo Baseline: TF-IDF + XGBoost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/03_Model_CNN1D.html">03 — CNN-1D para Clasificación de Texto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/04_Model_BiLSTM.html">04 — Word2Vec + BiLSTM con Keras Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/05_Model_FastText.html">05 — Modelo FastText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/06_Model_DistilBERT.html">06 — DistilBERT Fine-tuning para Clasificación de Currículos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nlp/07_Comparacion_Modelos.html">07 — Comparación de Modelos y Análisis Crítico</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/vision/01_EDA.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Analisis Exploratorio de datos</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#librerias">Librerias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#funciones">Funciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargado-de-datos-e-imagenes">Cargado de datos e imagenes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construccion-de-dataframe">Construccion de dataframe</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-graficos-de-altura-y-anchura">Analisis de graficos de altura y anchura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-celulas">Analisis de celulas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-pixeles-y-canales-de-color">Analisis de pixeles y canales de color</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="analisis-exploratorio-de-datos">
+<h1>Analisis Exploratorio de datos<a class="headerlink" href="#analisis-exploratorio-de-datos" title="Link to this heading">#</a></h1>
+<section id="librerias">
+<h2>Librerias<a class="headerlink" href="#librerias" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.express</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">patches</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;fivethirtyeight&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">bag</span><span class="p">,</span> <span class="n">diagnostics</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">termcolor</span><span class="w"> </span><span class="kn">import</span> <span class="n">colored</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.backends.cudnn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cudnn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim.lr_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReduceLROnPlateau</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">sampler</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">KFold</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="c1"># Activate pandas progress apply bar</span>
+<span class="n">tqdm</span><span class="o">.</span><span class="n">pandas</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">config</span><span class="p">:</span>
+    <span class="n">DIRECTORY_PATH</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;C:\Users\Hp\Documents\Deep_learning\Imagenes\sartorius-cell-instance-segmentation&quot;</span>
+    <span class="n">TRAIN_CSV</span> <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\train.csv&quot;</span>
+    <span class="n">TRAIN_PATH</span> <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\train&quot;</span>
+    <span class="n">TEST_PATH</span> <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\test&quot;</span>
+    <span class="n">TRAIN_SEMI_SUPERVISED_PATH</span> <span class="o">=</span> <span class="n">DIRECTORY_PATH</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\train_semi_supervised&quot;</span>
+    <span class="n">SEED</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># (336, 336)</span>
+    <span class="n">IMAGE_RESIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="funciones">
+<h2>Funciones<a class="headerlink" href="#funciones" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">getImagePaths</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to Combine Directory Path with individual Image Paths</span>
+<span class="sd">    </span>
+<span class="sd">    parameters: path(string) - Path of directory</span>
+<span class="sd">    returns: image_names(string) - Full Image Path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">filenames</span><span class="p">):</span>
+            <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">image_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">image_names</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="cargado-de-datos-e-imagenes">
+<h2>Cargado de datos e imagenes<a class="headerlink" href="#cargado-de-datos-e-imagenes" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">TRAIN_CSV</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_images_path</span> <span class="o">=</span> <span class="n">getImagePaths</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">TRAIN_PATH</span><span class="p">)</span>
+<span class="n">test_images_path</span> <span class="o">=</span> <span class="n">getImagePaths</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">TEST_PATH</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 606/606 [00:00&lt;00:00, 396900.10it/s]
+100%|██████████| 3/3 [00:00&lt;00:00, 2357.23it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>annotation</th>
+      <th>width</th>
+      <th>height</th>
+      <th>cell_type</th>
+      <th>plate_time</th>
+      <th>sample_date</th>
+      <th>sample_id</th>
+      <th>elapsed_timedelta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0030fd0e6378</td>
+      <td>118145 6 118849 7 119553 8 120257 8 120961 9 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0030fd0e6378</td>
+      <td>189036 1 189739 3 190441 6 191144 7 191848 8 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0030fd0e6378</td>
+      <td>173567 3 174270 5 174974 5 175678 6 176382 7 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0030fd0e6378</td>
+      <td>196723 4 197427 6 198130 7 198834 8 199538 8 2...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0030fd0e6378</td>
+      <td>167818 3 168522 5 169225 7 169928 8 170632 9 1...</td>
+      <td>704</td>
+      <td>520</td>
+      <td>shsy5y</td>
+      <td>11h30m00s</td>
+      <td>2019-06-16</td>
+      <td>shsy5y[diff]_E10-4_Vessel-714_Ph_3</td>
+      <td>0 days 11:30:00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_train</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 73585 entries, 0 to 73584
+Data columns (total 9 columns):
+ #   Column             Non-Null Count  Dtype 
+---  ------             --------------  ----- 
+ 0   id                 73585 non-null  object
+ 1   annotation         73585 non-null  object
+ 2   width              73585 non-null  int64 
+ 3   height             73585 non-null  int64 
+ 4   cell_type          73585 non-null  object
+ 5   plate_time         73585 non-null  object
+ 6   sample_date        73585 non-null  object
+ 7   sample_id          73585 non-null  object
+ 8   elapsed_timedelta  73585 non-null  object
+dtypes: int64(2), object(7)
+memory usage: 5.1+ MB
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training Dataset Shape: </span><span class="si">{</span><span class="n">df_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training Dataset Shape: (73585, 9)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_train</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">col</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_train</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()))))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>id:606
+annotation:73470
+width:1
+height:1
+cell_type:3
+plate_time:8
+sample_date:18
+sample_id:403
+elapsed_timedelta:8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of train images: </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_images_path</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of test images:  </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_images_path</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of train images: 606
+Number of test images:  3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_distribution</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+    <span class="n">df_train</span><span class="p">,</span> 
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="p">)</span>
+    
+    <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_distribution</span><span class="p">(</span><span class="s1">&#39;cell_type&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_distribution</span><span class="p">(</span><span class="s1">&#39;plate_time&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_distribution</span><span class="p">(</span><span class="s1">&#39;elapsed_timedelta&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">rle_decode</span><span class="p">(</span><span class="n">mask_rle</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    mask_rle: string RLE (start length)</span>
+<span class="sd">    shape: (height, width)</span>
+<span class="sd">    Returns: máscara binaria (h, w)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">mask_rle</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+    
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">ends</span> <span class="o">=</span> <span class="n">starts</span> <span class="o">+</span> <span class="n">lengths</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">):</span>
+        <span class="n">img</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">rle_area</span><span class="p">(</span><span class="n">mask_rle</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">mask_rle</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="construccion-de-dataframe">
+<h2>Construccion de dataframe<a class="headerlink" href="#construccion-de-dataframe" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_mask_area</span><span class="p">(</span><span class="n">rle</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Área de una máscara usando RLE (sin decodificar).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">rle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">rle</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>  <span class="c1"># suma de longitudes</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_dataframe</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">images_path</span><span class="p">):</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">img_id</span><span class="p">,</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">grouped</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Procesando imágenes&#39;</span><span class="p">):</span>
+        
+        <span class="c1"># metadata básica</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cell_type</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># ruta imagen</span>
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">images_path</span><span class="p">,</span> <span class="n">img_id</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>  <span class="c1"># cambia a .tif si aplica</span>
+
+        <span class="c1"># máscaras válidas (evita NaN)</span>
+        <span class="n">annotations</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+        <span class="c1"># número de máscaras</span>
+        <span class="n">n_masks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">annotations</span><span class="p">)</span>
+
+        <span class="c1"># áreas individuales</span>
+        <span class="n">areas</span> <span class="o">=</span> <span class="p">[</span><span class="n">compute_mask_area</span><span class="p">(</span><span class="n">rle</span><span class="p">)</span> <span class="k">for</span> <span class="n">rle</span> <span class="ow">in</span> <span class="n">annotations</span><span class="p">]</span>
+
+        <span class="c1"># manejar edge case: imágenes sin máscaras</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">area_total</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">area_mean</span>  <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">area_max</span>   <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">area_min</span>   <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">area_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+            <span class="n">area_mean</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+            <span class="n">area_max</span>   <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+            <span class="n">area_min</span>   <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;id_imagen&#39;</span>   <span class="p">:</span> <span class="n">img_id</span><span class="p">,</span>
+            <span class="s1">&#39;ruta_imagen&#39;</span> <span class="p">:</span> <span class="n">image_path</span><span class="p">,</span>
+            <span class="s1">&#39;cell_type&#39;</span>   <span class="p">:</span> <span class="n">cell_type</span><span class="p">,</span>
+            <span class="s1">&#39;width&#39;</span>       <span class="p">:</span> <span class="n">w</span><span class="p">,</span>
+            <span class="s1">&#39;height&#39;</span>      <span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+            <span class="s1">&#39;n_mascaras&#39;</span>  <span class="p">:</span> <span class="n">n_masks</span><span class="p">,</span>
+            <span class="s1">&#39;area_total&#39;</span>  <span class="p">:</span> <span class="n">area_total</span><span class="p">,</span>
+            <span class="s1">&#39;area_media&#39;</span>  <span class="p">:</span> <span class="n">area_mean</span><span class="p">,</span>
+            <span class="s1">&#39;area_max&#39;</span>    <span class="p">:</span> <span class="n">area_max</span><span class="p">,</span>
+            <span class="s1">&#39;area_min&#39;</span>    <span class="p">:</span> <span class="n">area_min</span><span class="p">,</span>
+            <span class="s1">&#39;areas&#39;</span>       <span class="p">:</span> <span class="n">areas</span><span class="p">,</span>
+        <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_img</span> <span class="o">=</span> <span class="n">build_dataframe</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">TRAIN_PATH</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">df_img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">df_img</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Procesando imágenes: 100%|██████████| 606/606 [00:00&lt;00:00, 1163.76it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(606, 11)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id_imagen</th>
+      <th>ruta_imagen</th>
+      <th>cell_type</th>
+      <th>width</th>
+      <th>height</th>
+      <th>n_mascaras</th>
+      <th>area_total</th>
+      <th>area_media</th>
+      <th>area_max</th>
+      <th>area_min</th>
+      <th>areas</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0030fd0e6378</td>
+      <td>C:\Users\Hp\Documents\Deep_learning\Imagenes\s...</td>
+      <td>shsy5y</td>
+      <td>704</td>
+      <td>520</td>
+      <td>395</td>
+      <td>113307</td>
+      <td>286.853165</td>
+      <td>757</td>
+      <td>46</td>
+      <td>[498, 228, 301, 521, 327, 178, 345, 154, 283, ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0140b3c8f445</td>
+      <td>C:\Users\Hp\Documents\Deep_learning\Imagenes\s...</td>
+      <td>astro</td>
+      <td>704</td>
+      <td>520</td>
+      <td>108</td>
+      <td>86735</td>
+      <td>803.101852</td>
+      <td>7126</td>
+      <td>138</td>
+      <td>[1282, 673, 577, 138, 450, 467, 1067, 808, 524...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>01ae5a43a2ab</td>
+      <td>C:\Users\Hp\Documents\Deep_learning\Imagenes\s...</td>
+      <td>cort</td>
+      <td>704</td>
+      <td>520</td>
+      <td>36</td>
+      <td>11382</td>
+      <td>316.166667</td>
+      <td>522</td>
+      <td>149</td>
+      <td>[262, 458, 196, 204, 522, 236, 345, 161, 149, ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>026b3c2c4b32</td>
+      <td>C:\Users\Hp\Documents\Deep_learning\Imagenes\s...</td>
+      <td>cort</td>
+      <td>704</td>
+      <td>520</td>
+      <td>42</td>
+      <td>7660</td>
+      <td>182.380952</td>
+      <td>355</td>
+      <td>84</td>
+      <td>[172, 182, 151, 197, 156, 187, 175, 126, 245, ...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>029e5b3b89c7</td>
+      <td>C:\Users\Hp\Documents\Deep_learning\Imagenes\s...</td>
+      <td>cort</td>
+      <td>704</td>
+      <td>520</td>
+      <td>34</td>
+      <td>5753</td>
+      <td>169.205882</td>
+      <td>277</td>
+      <td>107</td>
+      <td>[212, 125, 116, 223, 211, 221, 107, 188, 183, ...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_img</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 606 entries, 0 to 605
+Data columns (total 11 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   id_imagen    606 non-null    object 
+ 1   ruta_imagen  606 non-null    object 
+ 2   cell_type    606 non-null    object 
+ 3   width        606 non-null    int64  
+ 4   height       606 non-null    int64  
+ 5   n_mascaras   606 non-null    int64  
+ 6   area_total   606 non-null    int64  
+ 7   area_media   606 non-null    float64
+ 8   area_max     606 non-null    int64  
+ 9   area_min     606 non-null    int64  
+ 10  areas        606 non-null    object 
+dtypes: float64(1), int64(6), object(4)
+memory usage: 52.2+ KB
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="analisis-de-graficos-de-altura-y-anchura">
+<h2>Analisis de graficos de altura y anchura<a class="headerlink" href="#analisis-de-graficos-de-altura-y-anchura" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+
+<span class="c1"># Paletas</span>
+<span class="n">palette_main</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;Set2&quot;</span><span class="p">)</span>
+<span class="n">palette_alt</span>  <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;husl&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Alturas</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Alturas&#39;</span><span class="p">)</span>
+
+<span class="c1"># Anchos</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Anchos&#39;</span><span class="p">)</span>
+
+<span class="c1"># Scatter</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span>
+    <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Alto vs Ancho&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/75629134cfec5ae300cbfb5b2a975e58da7730abce1a2bb0ad04025fb55b5689.png" src="../../_images/75629134cfec5ae300cbfb5b2a975e58da7730abce1a2bb0ad04025fb55b5689.png" />
+</div>
+</div>
+<p>podemos observar que las imagenes tienen 520 de alto y 704 de ancho y todas tienen las mismas dimensiones</p>
+</section>
+<section id="analisis-de-celulas">
+<h2>Analisis de celulas<a class="headerlink" href="#analisis-de-celulas" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Histograma</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;n_mascaras&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Número de células&#39;</span><span class="p">)</span>
+
+<span class="c1"># Boxplot</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;n_mascaras&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Boxplot células&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/30ab278145398de675b945cc92b2650d73ae72692d7d7b2d01c934c4e6bfa0ba.png" src="../../_images/30ab278145398de675b945cc92b2650d73ae72692d7d7b2d01c934c4e6bfa0ba.png" />
+</div>
+</div>
+<p><strong>Análisis exploratorio: distribución del número de células (máscaras)</strong></p>
+<p>Se presenta la distribución del número de máscaras por imagen en el dataset de Sartorius, a través de un histograma y un diagrama de caja (boxplot), con el objetivo de caracterizar la complejidad estructural de las imágenes.</p>
+<p><strong>Distribución de frecuencias</strong></p>
+<p>El histograma evidencia que la variable <code class="docutils literal notranslate"><span class="pre">n_mascaras</span></code> presenta una <strong>distribución fuertemente sesgada a la derecha</strong>. La mayoría de las imágenes contienen un número relativamente bajo de células (principalmente en el rango de 0 a 100), mientras que existe una <strong>cola larga</strong> que se extiende hasta valores cercanos a 800 máscaras.</p>
+<p>Este comportamiento indica la presencia de un <strong>desbalance en la densidad celular</strong>, donde predominan imágenes simples (pocas células) frente a un menor número de imágenes altamente densas.</p>
+<p><strong>Análisis de dispersión</strong></p>
+<p>El boxplot confirma los hallazgos anteriores:</p>
+<ul class="simple">
+<li><p>La <strong>mediana</strong> se ubica en valores bajos, consistente con la concentración de datos en imágenes poco densas.</p></li>
+<li><p>El <strong>rango intercuartílico (IQR)</strong> es relativamente estrecho y se concentra en valores bajos.</p></li>
+<li><p>Se observan <strong>numerosos valores atípicos (outliers)</strong> hacia la derecha, correspondientes a imágenes con alta densidad celular.</p></li>
+</ul>
+<p>Estos resultados evidencian que la distribución no es normal y está dominada por valores extremos en el extremo superior.</p>
+<p><strong>Implicaciones para el modelado</strong></p>
+<p>La estructura observada tiene varias implicaciones relevantes:</p>
+<ul class="simple">
+<li><p>Existe un <strong>desbalance en la complejidad de las muestras</strong>, lo que puede sesgar el entrenamiento hacia casos más simples.</p></li>
+<li><p>Los modelos pueden presentar dificultades para generalizar en imágenes con alta densidad celular.</p></li>
+<li><p>Métricas globales de desempeño podrían estar dominadas por ejemplos de baja complejidad.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_areas</span> <span class="o">=</span> <span class="p">[</span><span class="n">area</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;areas&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Histograma</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">all_areas</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Áreas de células&#39;</span><span class="p">)</span>
+
+<span class="c1"># Boxplot</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">all_areas</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">palette_main</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Boxplot áreas&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/fa4dbeeb575ae3428785c3260dcd4aa7ec34694099ac1658689771c8c62c7aba.png" src="../../_images/fa4dbeeb575ae3428785c3260dcd4aa7ec34694099ac1658689771c8c62c7aba.png" />
+</div>
+</div>
+<p><strong>Análisis exploratorio: distribución de áreas de células</strong></p>
+<p>Se analiza la distribución de las áreas de las células segmentadas en el dataset de Sartorius mediante un histograma y un diagrama de caja (boxplot), con el fin de comprender la variabilidad en el tamaño de los objetos de interés.</p>
+<p><strong>Distribución de frecuencias</strong></p>
+<p>El histograma muestra que las áreas celulares presentan una <strong>distribución altamente sesgada a la derecha</strong>. La gran mayoría de las células tienen áreas pequeñas, concentrándose en los primeros rangos, mientras que existe una <strong>cola larga</strong> que alcanza valores extremadamente altos (por encima de 10,000).</p>
+<p>Este patrón indica que predominan células pequeñas, coexistiendo con un número reducido de células de gran tamaño.</p>
+<p><strong>Análisis de dispersión</strong></p>
+<p>El boxplot refuerza estos hallazgos:</p>
+<ul class="simple">
+<li><p>La <strong>mediana</strong> se encuentra en valores bajos, reflejando la predominancia de células pequeñas.</p></li>
+<li><p>El <strong>rango intercuartílico (IQR)</strong> es estrecho y concentrado en áreas pequeñas.</p></li>
+<li><p>Se identifican <strong>numerosos valores atípicos (outliers)</strong> hacia valores altos, correspondientes a células significativamente más grandes que la mayoría.</p></li>
+</ul>
+<p>Esto evidencia una distribución no normal, con presencia marcada de valores extremos.</p>
+<p><strong>Implicaciones para el modelado</strong></p>
+<p>La heterogeneidad en el tamaño de las células tiene implicaciones importantes:</p>
+<ul class="simple">
+<li><p>Los modelos pueden <strong>favorecer la detección de células pequeñas</strong>, debido a su alta frecuencia en el dataset.</p></li>
+<li><p>Las células grandes, al ser menos frecuentes, pueden ser más difíciles de segmentar correctamente.</p></li>
+<li><p>Existe riesgo de sesgo en métricas globales, donde el desempeño en objetos pequeños domine la evaluación.</p></li>
+</ul>
+</section>
+<section id="analisis-de-pixeles-y-canales-de-color">
+<h2>Analisis de pixeles y canales de color<a class="headerlink" href="#analisis-de-pixeles-y-canales-de-color" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pixel_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># sample para no cargar todo el dataset (muy importante)</span>
+<span class="n">sample_df</span> <span class="o">=</span> <span class="n">df_img</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_img</span><span class="p">)),</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">sample_df</span><span class="p">[</span><span class="s1">&#39;ruta_imagen&#39;</span><span class="p">]:</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">continue</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+
+    <span class="c1"># convertir a lista de píxeles (N x 3)</span>
+    <span class="n">pixel_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="c1"># concatenar todo</span>
+<span class="n">pixel_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">pixel_values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]</span>
+<span class="n">colors</span>   <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">pixel_values</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Canal </span><span class="si">{</span><span class="n">channels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/e4eea38d7138b7c838bffc64bcb7c66577219324f0381d355b3a25af84923d24.png" src="../../_images/e4eea38d7138b7c838bffc64bcb7c66577219324f0381d355b3a25af84923d24.png" />
+</div>
+</div>
+<p><strong>Análisis exploratorio: distribución de intensidades RGB</strong></p>
+<p>Se analiza la distribución de intensidades de los canales de color RGB (Red, Green y Blue) en las imágenes del dataset de Sartorius, con el objetivo de identificar patrones de iluminación, contraste y composición cromática presentes en los datos.</p>
+<p><strong>Distribución de intensidades por canal</strong></p>
+<p>Los histogramas correspondientes a los canales R, G y B presentan comportamientos muy similares:</p>
+<ul class="simple">
+<li><p>Las distribuciones se encuentran <strong>altamente concentradas en un rango estrecho de intensidades</strong>, aproximadamente entre 110 y 145.</p></li>
+<li><p>Se observa una forma aproximadamente simétrica y unimodal alrededor de un valor central cercano a 128.</p></li>
+<li><p>No existen concentraciones relevantes en valores extremos cercanos a 0 o 255.</p></li>
+</ul>
+<p>Esto sugiere que las imágenes poseen una iluminación relativamente homogénea y una exposición bien controlada.</p>
+<p><strong>Comparación entre canales</strong></p>
+<p>Los tres canales presentan distribuciones prácticamente equivalentes:</p>
+<ul class="simple">
+<li><p>No se evidencia predominancia significativa de un color específico.</p></li>
+<li><p>Las diferencias entre canales son mínimas, lo que indica una composición cromática balanceada.</p></li>
+<li><p>La similitud entre distribuciones sugiere baja variabilidad en condiciones de adquisición o preprocesamiento de las imágenes.</p></li>
+</ul>
+<p><strong>Implicaciones para el modelado</strong></p>
+<p>Los resultados obtenidos tienen varias implicaciones importantes:</p>
+<ul class="simple">
+<li><p>La homogeneidad de intensidades puede facilitar el proceso de entrenamiento, reduciendo variaciones asociadas a iluminación.</p></li>
+<li><p>La ausencia de extremos pronunciados disminuye la probabilidad de saturación o pérdida de información visual.</p></li>
+<li><p>La similitud entre canales sugiere que gran parte de la información discriminativa podría encontrarse en las estructuras espaciales y texturas, más que en diferencias cromáticas.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">overlay_masks</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="n">overlay</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;husl&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">mask</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>  
+
+        <span class="n">overlay</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">overlay</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">color</span> <span class="o">*</span> <span class="n">alpha</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">overlay</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+
+<span class="n">sample_ids</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">]),</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">img_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sample_ids</span><span class="p">):</span>
+    
+    <span class="n">row</span> <span class="o">=</span> <span class="n">df_img</span><span class="p">[</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">img_id</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;ruta_imagen&#39;</span><span class="p">]</span>
+    
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span>
+    
+    <span class="n">rles</span> <span class="o">=</span> <span class="n">df_train</span><span class="p">[</span><span class="n">df_train</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">img_id</span><span class="p">][</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="p">[</span><span class="n">rle_decode</span><span class="p">(</span><span class="n">rle</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span> <span class="k">for</span> <span class="n">rle</span> <span class="ow">in</span> <span class="n">rles</span><span class="p">]</span>
+
+    <span class="n">overlay</span> <span class="o">=</span> <span class="n">overlay_masks</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks</span><span class="p">)</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Original </span><span class="si">{</span><span class="n">img_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">overlay</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Máscaras&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/6a2645e828a63c5ad87158e3c56d3153b3174d347fe7aaa047a2cc1504d0a30f.png" src="../../_images/6a2645e828a63c5ad87158e3c56d3153b3174d347fe7aaa047a2cc1504d0a30f.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Métricas por cell_type</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df_img</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;n_mascaras&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Células por imagen por tipo&#39;</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df_img</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;area_media&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Área media por tipo de célula&#39;</span><span class="p">)</span>
+
+<span class="c1"># Cobertura = qué % de la imagen está anotado</span>
+<span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;cobertura&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;area_total&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df_img</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;cobertura&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Cobertura de máscaras por tipo&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/5ad9dee000868ad860d0e74a6e105e075d457472ea5d00b11a25586f88dfef1d.png" src="../../_images/5ad9dee000868ad860d0e74a6e105e075d457472ea5d00b11a25586f88dfef1d.png" />
+</div>
+</div>
+<p><strong>Análisis exploratorio: características por tipo de célula</strong></p>
+<p>Se analiza el comportamiento de las distintas clases celulares presentes en el dataset de Sartorius (<code class="docutils literal notranslate"><span class="pre">shsy5y</span></code>, <code class="docutils literal notranslate"><span class="pre">astro</span></code> y <code class="docutils literal notranslate"><span class="pre">cort</span></code>) mediante métricas relacionadas con la cantidad de células por imagen, el área promedio de las máscaras y la cobertura total de segmentación.</p>
+<p><strong>Número de células por imagen</strong></p>
+<p>El primer boxplot muestra diferencias significativas en la cantidad de células presentes por imagen según el tipo celular:</p>
+<ul class="simple">
+<li><p><strong>shsy5y</strong> presenta la mayor cantidad de máscaras por imagen, con una mediana elevada y una dispersión considerable.</p></li>
+<li><p><strong>astro</strong> muestra una cantidad intermedia de células, aunque con presencia de valores atípicos elevados.</p></li>
+<li><p><strong>cort</strong> posee la menor densidad celular y la distribución más compacta.</p></li>
+</ul>
+<p>Además, se observan numerosos valores extremos, especialmente en <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code>, donde algunas imágenes alcanzan valores cercanos a 800 máscaras.</p>
+<p>Estos resultados evidencian una alta variabilidad en densidad celular entre clases, lo cual implica diferentes niveles de complejidad para el modelo de segmentación.</p>
+<p><strong>Área media de las células</strong></p>
+<p>El segundo gráfico muestra diferencias importantes en el tamaño promedio de las células:</p>
+<ul class="simple">
+<li><p>Las células tipo <strong>astro</strong> presentan las áreas medias más grandes y la mayor variabilidad.</p></li>
+<li><p>Las clases <strong>shsy5y</strong> y <strong>cort</strong> poseen áreas considerablemente menores y distribuciones más concentradas.</p></li>
+<li><p>Se identifican múltiples outliers en <code class="docutils literal notranslate"><span class="pre">astro</span></code>, indicando la presencia de células excepcionalmente grandes.</p></li>
+</ul>
+<p>Esto sugiere que cada tipo celular posee características morfológicas diferenciadas, particularmente en términos de tamaño.</p>
+<p><strong>Cobertura de máscaras por tipo</strong></p>
+<p>El tercer boxplot representa la proporción de la imagen cubierta por máscaras celulares:</p>
+<ul class="simple">
+<li><p><strong>shsy5y</strong> y <strong>astro</strong> presentan coberturas relativamente altas y similares.</p></li>
+<li><p><strong>cort</strong> muestra coberturas significativamente menores.</p></li>
+<li><p>La clase <code class="docutils literal notranslate"><span class="pre">astro</span></code> exhibe una dispersión elevada y algunos valores extremos que superan el 60% de cobertura.</p></li>
+</ul>
+<p>La diferencia en cobertura indica que ciertas clases generan imágenes mucho más densas y complejas desde el punto de vista espacial.</p>
+<p><strong>Implicaciones para el modelado</strong></p>
+<p>Las diferencias observadas entre tipos celulares tienen implicaciones importantes:</p>
+<ul class="simple">
+<li><p>El modelo deberá aprender patrones morfológicos y espaciales significativamente distintos entre clases.</p></li>
+<li><p>Las imágenes de <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> y <code class="docutils literal notranslate"><span class="pre">astro</span></code> pueden representar un mayor desafío debido a la alta densidad y superposición potencial de células.</p></li>
+<li><p>Las diferencias en tamaño y cobertura podrían generar sesgos en métricas globales de segmentación.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. Detección de outliers en área</span>
+<span class="n">q1</span><span class="p">,</span> <span class="n">q99</span> <span class="o">=</span> <span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;area_media&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">])</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">df_img</span><span class="p">[(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;area_media&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">q1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;area_media&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">q99</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Imágenes con áreas outlier: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outliers</span><span class="p">[[</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mascaras&#39;</span><span class="p">,</span> <span class="s1">&#39;area_media&#39;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Imágenes con áreas outlier: 14
+        id_imagen cell_type  n_mascaras   area_media
+31   0eb1d03df587    shsy5y         550   115.796364
+48   15aeb12e7a83     astro          47  2240.765957
+58   1974fbb27dcf    shsy5y         531   113.826742
+67   1ce663c98a16      cort          17   118.117647
+100  26efe388938c      cort          58   105.827586
+165  45b966b60d4b     astro          29  2066.758621
+223  5a05cc33a43d     astro          87  2446.563218
+231  5c84424f601c     astro          74  2117.891892
+352  91c06d4f10df     astro          80  2006.262500
+400  a97d5689d4c2     astro          14  2272.785714
+538  e33d521aa9de      cort          25    96.440000
+554  e92c56871769      cort           4    97.000000
+570  eec79772cb99      cort           5    86.800000
+602  fe33dfcf4ebd     astro          60  2243.433333
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Análisis de imágenes con áreas atípicas (outliers)</strong></p>
+<p>Se identificaron 14 imágenes con valores atípicos en la variable <code class="docutils literal notranslate"><span class="pre">area_media</span></code>, correspondientes a casos extremos en el tamaño promedio de las células segmentadas. El análisis de estos outliers permite comprender mejor la variabilidad morfológica presente en el dataset y evaluar posibles implicaciones para el entrenamiento del modelo.</p>
+<p><strong>Distribución de los outliers por tipo celular</strong></p>
+<p>Los valores atípicos se concentran principalmente en la clase <code class="docutils literal notranslate"><span class="pre">astro</span></code>, aunque también aparecen algunos casos en <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> y <code class="docutils literal notranslate"><span class="pre">cort</span></code>.</p>
+<p><strong>Clase <code class="docutils literal notranslate"><span class="pre">astro</span></code></strong></p>
+<p>Las imágenes tipo <code class="docutils literal notranslate"><span class="pre">astro</span></code> presentan los mayores valores de área promedio, alcanzando valores superiores a 2400 píxeles. Ejemplos representativos incluyen:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">5a05cc33a43d</span></code> → área media ≈ 2446</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fe33dfcf4ebd</span></code> → área media ≈ 2243</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">15aeb12e7a83</span></code> → área media ≈ 2240</p></li>
+</ul>
+<p>Estos resultados son consistentes con la morfología observada previamente para este tipo celular:</p>
+<ul class="simple">
+<li><p>células grandes,</p></li>
+<li><p>estructuras alargadas,</p></li>
+<li><p>y extensiones ramificadas.</p></li>
+</ul>
+<p>Además, las imágenes <code class="docutils literal notranslate"><span class="pre">astro</span></code> suelen contener un número moderado de máscaras, pero cada célula ocupa una región considerable del espacio.</p>
+<p><strong>Clase <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code></strong></p>
+<p>Las imágenes <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> identificadas como outliers presentan:</p>
+<ul class="simple">
+<li><p>una cantidad extremadamente alta de máscaras (<code class="docutils literal notranslate"><span class="pre">&gt;500</span></code>),</p></li>
+<li><p>pero áreas medias relativamente pequeñas (~114 píxeles).</p></li>
+</ul>
+<p>Esto indica escenarios de:</p>
+<ul class="simple">
+<li><p>alta densidad celular,</p></li>
+<li><p>fuerte agrupamiento,</p></li>
+<li><p>y predominancia de células pequeñas.</p></li>
+</ul>
+<p>Estos casos representan imágenes complejas desde el punto de vista de segmentación por instancia, debido a la proximidad entre objetos.</p>
+<p><strong>Clase <code class="docutils literal notranslate"><span class="pre">cort</span></code></strong></p>
+<p>Los casos atípicos de <code class="docutils literal notranslate"><span class="pre">cort</span></code> muestran:</p>
+<ul class="simple">
+<li><p>muy pocas máscaras,</p></li>
+<li><p>y áreas medias pequeñas (&lt;120 píxeles).</p></li>
+</ul>
+<p>Aunque aparecen como outliers estadísticos, probablemente corresponden a imágenes extremadamente dispersas o con escasa presencia celular.</p>
+<p><strong>Interpretación general</strong></p>
+<p>Los outliers identificados no parecen corresponder necesariamente a errores del dataset, sino a casos biológicamente plausibles asociados a diferencias morfológicas reales entre tipos celulares.</p>
+<p>En particular:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">astro</span></code> contribuye principalmente con outliers de gran tamaño celular.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> contribuye con outliers de alta densidad.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cort</span></code> presenta escenarios extremos de baja densidad y células pequeñas.</p></li>
+</ul>
+<p>Esto confirma nuevamente la elevada heterogeneidad estructural del dataset.</p>
+<p><strong>Implicaciones para el modelado</strong></p>
+<p>La presencia de estos casos extremos puede afectar significativamente el desempeño del modelo:</p>
+<ul class="simple">
+<li><p>Los outliers de <code class="docutils literal notranslate"><span class="pre">astro</span></code> pueden dificultar la segmentación de estructuras grandes y ramificadas.</p></li>
+<li><p>Los casos densos de <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> incrementan el riesgo de:</p>
+<ul>
+<li><p>sobresegmentación,</p></li>
+<li><p>subsegmentación,</p></li>
+<li><p>o fusión de instancias.</p></li>
+</ul>
+</li>
+<li><p>Los ejemplos de <code class="docutils literal notranslate"><span class="pre">cort</span></code> pueden generar falsos negativos debido al pequeño tamaño celular.</p></li>
+</ul>
+<p>Asimismo, estos casos pueden influir desproporcionadamente en métricas globales de entrenamiento y evaluación.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Imágenes de ejemplo por tipo de célula</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ctype</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;astro&#39;</span><span class="p">,</span> <span class="s1">&#39;cort&#39;</span><span class="p">,</span> <span class="s1">&#39;shsy5y&#39;</span><span class="p">]):</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">df_img</span><span class="p">[</span><span class="n">df_img</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ctype</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;ruta_imagen&#39;</span><span class="p">]),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+    <span class="n">rles</span> <span class="o">=</span> <span class="n">df_train</span><span class="p">[</span><span class="n">df_train</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;id_imagen&#39;</span><span class="p">]][</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="p">[</span><span class="n">rle_decode</span><span class="p">(</span><span class="n">rle</span><span class="p">,</span> <span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]))</span> <span class="k">for</span> <span class="n">rle</span> <span class="ow">in</span> <span class="n">rles</span><span class="p">]</span>
+    <span class="n">overlay</span> <span class="o">=</span> <span class="n">overlay_masks</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">masks</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s1"> - original&#39;</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">overlay</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s1"> - máscaras&#39;</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/dc3b456613087d634ecf25560d8f328b21931a527fe307e482a1b5bdaca3c599.png" src="../../_images/dc3b456613087d634ecf25560d8f328b21931a527fe307e482a1b5bdaca3c599.png" />
+</div>
+</div>
+<p><strong>Análisis visual comparativo: imágenes originales y máscaras por tipo celular</strong></p>
+<p>Se presenta una comparación entre imágenes originales y sus respectivas máscaras de segmentación para los tipos celulares <code class="docutils literal notranslate"><span class="pre">astro</span></code>, <code class="docutils literal notranslate"><span class="pre">cort</span></code> y <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code>, con el objetivo de identificar diferencias morfológicas, espaciales y estructurales relevantes para el proceso de segmentación.</p>
+<p><strong>Tipo celular: astro</strong></p>
+<p>Las imágenes correspondientes a <code class="docutils literal notranslate"><span class="pre">astro</span></code> muestran células con:</p>
+<ul class="simple">
+<li><p>Morfologías alargadas e irregulares.</p></li>
+<li><p>Estructuras ramificadas y extensiones finas.</p></li>
+<li><p>Baja densidad celular relativa, pero con gran ocupación espacial por célula.</p></li>
+</ul>
+<p>Las máscaras reflejan objetos complejos y de geometría variable, con formas no compactas y límites difusos en algunas regiones.</p>
+<p><strong>Implicaciones</strong></p>
+<ul class="simple">
+<li><p>La segmentación de <code class="docutils literal notranslate"><span class="pre">astro</span></code> representa un desafío debido a:</p>
+<ul>
+<li><p>contornos delgados,</p></li>
+<li><p>estructuras ramificadas,</p></li>
+<li><p>y posibles conexiones entre células.</p></li>
+</ul>
+</li>
+<li><p>Los modelos deberán capturar detalles finos y relaciones espaciales complejas.</p></li>
+</ul>
+<p><strong>Tipo celular: cort</strong></p>
+<p>Las imágenes de <code class="docutils literal notranslate"><span class="pre">cort</span></code> presentan:</p>
+<ul class="simple">
+<li><p>Baja densidad celular.</p></li>
+<li><p>Células pequeñas y dispersas.</p></li>
+<li><p>Gran cantidad de fondo visible.</p></li>
+</ul>
+<p>Las máscaras muestran objetos relativamente compactos y bien separados entre sí.</p>
+<p><strong>Implicaciones</strong></p>
+<ul class="simple">
+<li><p>La segmentación resulta potencialmente más sencilla por la baja superposición celular.</p></li>
+<li><p>Sin embargo, el pequeño tamaño de los objetos puede dificultar la detección precisa.</p></li>
+<li><p>Existe riesgo de falsos negativos en células pequeñas o de bajo contraste.</p></li>
+</ul>
+<p><strong>Tipo celular: shsy5y</strong></p>
+<p>Las imágenes de <code class="docutils literal notranslate"><span class="pre">shsy5y</span></code> exhiben:</p>
+<ul class="simple">
+<li><p>Alta densidad celular.</p></li>
+<li><p>Fuerte agrupamiento espacial.</p></li>
+<li><p>Mayor uniformidad en tamaño y forma respecto a otras clases.</p></li>
+</ul>
+<p>Las máscaras evidencian una gran cantidad de objetos cercanos entre sí, con regiones potencialmente superpuestas.</p>
+<p><strong>Implicaciones</strong></p>
+<ul class="simple">
+<li><p>La alta densidad incrementa la complejidad de segmentación.</p></li>
+<li><p>El modelo debe diferenciar correctamente células adyacentes y evitar fusiones entre máscaras.</p></li>
+<li><p>Puede existir mayor sensibilidad a errores de separación de instancias.</p></li>
+</ul>
+<p><strong>Comparación global entre tipos celulares</strong></p>
+<p>La comparación visual permite identificar diferencias estructurales importantes:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo celular</p></th>
+<th class="head"><p>Densidad</p></th>
+<th class="head"><p>Tamaño</p></th>
+<th class="head"><p>Complejidad morfológica</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>astro</p></td>
+<td><p>Media</p></td>
+<td><p>Grande</p></td>
+<td><p>Alta</p></td>
+</tr>
+<tr class="row-odd"><td><p>cort</p></td>
+<td><p>Baja</p></td>
+<td><p>Pequeño</p></td>
+<td><p>Baja</p></td>
+</tr>
+<tr class="row-even"><td><p>shsy5y</p></td>
+<td><p>Alta</p></td>
+<td><p>Media</p></td>
+<td><p>Media</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Estas diferencias indican que el dataset posee una elevada heterogeneidad visual y morfológica, lo cual representa un reto significativo para los modelos de segmentación.</p>
+<p><strong>Implicaciones para el modelado</strong></p>
+<p>Las variaciones observadas sugieren que:</p>
+<ul class="simple">
+<li><p>El modelo deberá generalizar sobre múltiples escalas y morfologías celulares.</p></li>
+<li><p>Diferentes clases pueden requerir distintos niveles de sensibilidad espacial.</p></li>
+<li><p>Las arquitecturas multi-escala y los mecanismos de atención podrían resultar beneficiosos.</p></li>
+</ul>
+<p>Asimismo, las diferencias entre clases justifican:</p>
+<ul class="simple">
+<li><p>evaluación estratificada por tipo celular,</p></li>
+<li><p>augmentations específicas,</p></li>
+<li><p>y análisis detallado de errores según morfología.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/vision"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Deep Learning: Segmentación de Células e Interpretación de Texto</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_preprocesamiento_sartorius.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Preprocesamiento para Modelado</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#librerias">Librerias</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#funciones">Funciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargado-de-datos-e-imagenes">Cargado de datos e imagenes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construccion-de-dataframe">Construccion de dataframe</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-graficos-de-altura-y-anchura">Analisis de graficos de altura y anchura</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-celulas">Analisis de celulas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-pixeles-y-canales-de-color">Analisis de pixeles y canales de color</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mateo Gomez, Mateo Molinares, David Ibañez y Alejandro Moya
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

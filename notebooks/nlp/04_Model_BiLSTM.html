@@ -1,0 +1,1491 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>04 — Word2Vec + BiLSTM con Keras Tuner &#8212; Deep Learning: Segmentación de Células e Interpretación de Texto</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/nlp/04_Model_BiLSTM';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="05 — Modelo FastText" href="05_Model_FastText.html" />
+    <link rel="prev" title="03 — CNN-1D para Clasificación de Texto" href="03_Model_CNN1D.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Deep Learning: Segmentación de Células e Interpretación de Texto - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Deep Learning: Segmentación de Células e Interpretación de Texto
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 1 — Segmentación de Imágenes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../vision/01_EDA.html">Analisis Exploratorio de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/02_preprocesamiento_sartorius.html">Preprocesamiento para Modelado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/03_modelado_sartorius_cellpose.html">Modelado — Sartorius Cell Instance Segmentation-Cellpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/04_modelado_sartorius_OPTIMIZADO.html">04 — Modelado Sartorius · OPTIMIZADO para Colab Pro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/05_hover-net.html">Modelado — HoVer-Net</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/06_mask_rcnn.html">Modelado — Mask R-CNN con Swin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision/07_evaluacion_final.html">Evaluación Final — Sartorius Cell Instance Segmentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Bloque 2 — NLP</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_EDA_NLP_Resume.html">Bloque 2 - NLP: EDA y Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Model_TFIDF_XGBoost.html">02 — Modelo Baseline: TF-IDF + XGBoost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Model_CNN1D.html">03 — CNN-1D para Clasificación de Texto</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">04 — Word2Vec + BiLSTM con Keras Tuner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Model_FastText.html">05 — Modelo FastText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Model_DistilBERT.html">06 — DistilBERT Fine-tuning para Clasificación de Currículos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Comparacion_Modelos.html">07 — Comparación de Modelos y Análisis Crítico</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/notebooks/nlp/04_Model_BiLSTM.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>04 — Word2Vec + BiLSTM con Keras Tuner</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-y-configuracion">1. Imports y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-artefactos-y-datos">2. Carga de artefactos y datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tokenizacion-propia-para-word2vec">3. Tokenización propia para Word2Vec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento-word2vec">4. Entrenamiento Word2Vec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construccion-de-secuencias-e-indices-para-el-modelo">5. Construcción de secuencias e índices para el modelo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-embeddings-preentrenadas">6. Matrices de embeddings preentrenadas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definicion-del-modelo-para-keras-tuner">7. Definición del modelo para Keras Tuner</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keras-tuner-randomsearch">8. Keras Tuner — RandomSearch</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nota-sobre-la-busqueda-de-hiperparametros">Nota sobre la búsqueda de hiperparámetros</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento-final-con-los-mejores-hiperparametros">9. Entrenamiento final con los mejores hiperparámetros</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-de-entrenamiento">10. Curvas de entrenamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluacion-en-test">11. Evaluación en test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-confusion">12. Matriz de confusión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-roc">13. Curva ROC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-precision-recall">14. Curva Precision-Recall</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardado-de-metricas">15. Guardado de métricas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-critico">16. Análisis crítico</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="word2vec-bilstm-con-keras-tuner">
+<h1>04 — Word2Vec + BiLSTM con Keras Tuner<a class="headerlink" href="#word2vec-bilstm-con-keras-tuner" title="Link to this heading">#</a></h1>
+<p><strong>Modelo:</strong> Bidirectional LSTM con embeddings Word2Vec entrenados sobre el corpus<br />
+<strong>Búsqueda de hiperparámetros:</strong> Keras Tuner — RandomSearch (20 trials)<br />
+<strong>Input:</strong> texto limpio de train → Word2Vec → secuencias paddeadas<br />
+<strong>Output:</strong> categoría profesional (24 clases)<br />
+<strong>Entorno:</strong> Python 3.10 · TensorFlow 2.20.0 · GPU (CUDA)<br />
+<strong>Semilla global:</strong> 42</p>
+<section id="imports-y-configuracion">
+<h2>1. Imports y configuración<a class="headerlink" href="#imports-y-configuracion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span>
+    <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span>
+    <span class="n">roc_curve</span><span class="p">,</span> <span class="n">auc</span><span class="p">,</span> <span class="n">precision_recall_curve</span><span class="p">,</span> <span class="n">average_precision_score</span><span class="p">,</span>
+    <span class="n">classification_report</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">label_binarize</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras</span><span class="w"> </span><span class="kn">import</span> <span class="n">layers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarlyStopping</span><span class="p">,</span> <span class="n">ReduceLROnPlateau</span><span class="p">,</span> <span class="n">ModelCheckpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.preprocessing.sequence</span><span class="w"> </span><span class="kn">import</span> <span class="n">pad_sequences</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">gensim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gensim.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word2Vec</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">keras_tuner</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">kt</span>
+
+<span class="c1"># ── Semilla global ──────────────────────────────────────────────────────────</span>
+<span class="n">SEED</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYTHONHASHSEED&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+
+<span class="c1"># ── Rutas ──────────────────────────────────────────────────────────────────</span>
+<span class="n">BASE_DIR</span>      <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">))</span>
+<span class="n">ARTIFACTS_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;artifacts&#39;</span><span class="p">)</span>
+<span class="n">MODELS_DIR</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;models&#39;</span><span class="p">)</span>
+<span class="n">METRICS_DIR</span>   <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;metrics&#39;</span><span class="p">)</span>
+<span class="n">TUNER_DIR</span>     <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;tuner_bilstm&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span>  <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">METRICS_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">TUNER_DIR</span><span class="p">,</span>   <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TensorFlow:&#39;</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Keras Tuner:&#39;</span><span class="p">,</span> <span class="n">kt</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Gensim:&#39;</span><span class="p">,</span> <span class="n">gensim</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;GPUs disponibles:&#39;</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-05-16 13:56:19.771613: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-05-16 13:56:20.101295: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-05-16 13:56:21.925730: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TensorFlow: 2.20.0
+Keras Tuner: 1.4.8
+Gensim: 4.4.0
+GPUs disponibles: [PhysicalDevice(name=&#39;/physical_device:GPU:0&#39;, device_type=&#39;GPU&#39;)]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="carga-de-artefactos-y-datos">
+<h2>2. Carga de artefactos y datos<a class="headerlink" href="#carga-de-artefactos-y-datos" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Config y LabelEncoder ──────────────────────────────────────────────────</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;config.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;label_encoder.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">le</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">VOCAB_SIZE</span>  <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;VOCAB_SIZE&#39;</span><span class="p">]</span>
+<span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;NUM_CLASSES&#39;</span><span class="p">]</span>
+<span class="n">CLASS_NAMES</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">classes_</span>
+
+<span class="c1"># ── Etiquetas ──────────────────────────────────────────────────────────────</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_train.npy&#39;</span><span class="p">))</span>
+<span class="n">y_val</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_val.npy&#39;</span><span class="p">))</span>
+<span class="n">y_test</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;y_test.npy&#39;</span><span class="p">))</span>
+
+<span class="c1"># ── Texto limpio desde CSV (para Word2Vec) ─────────────────────────────────</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;Resume.csv&#39;</span><span class="p">))</span>
+
+<span class="c1"># Replicar el mismo preprocesamiento del EDA</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">nltk</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nltk.corpus</span><span class="w"> </span><span class="kn">import</span> <span class="n">stopwords</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;stopwords&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">STOP_WORDS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clean_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;http\S+|www\S+|\S+@\S+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^a-z\s]&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">STOP_WORDS</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Resume_str&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">clean_text</span><span class="p">)</span>
+
+<span class="c1"># Recuperar los mismos índices de split usados en el EDA</span>
+<span class="c1"># (los artefactos X_*.npy están en el mismo orden que los splits)</span>
+<span class="c1"># Cargamos X_train.npy solo para saber cuántas muestras hay en cada split</span>
+<span class="n">X_train_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;X_train.npy&#39;</span><span class="p">))</span>
+<span class="n">X_val_seq</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;X_val.npy&#39;</span><span class="p">))</span>
+<span class="n">X_test_seq</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ARTIFACTS_DIR</span><span class="p">,</span> <span class="s1">&#39;X_test.npy&#39;</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Train: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="si">}</span><span class="s1">  Val: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">)</span><span class="si">}</span><span class="s1">  Test: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;NUM_CLASSES=</span><span class="si">{</span><span class="n">NUM_CLASSES</span><span class="si">}</span><span class="s1">  VOCAB_SIZE=</span><span class="si">{</span><span class="n">VOCAB_SIZE</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Train: 1738  Val: 373  Test: 373
+NUM_CLASSES=24  VOCAB_SIZE=20000
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="tokenizacion-propia-para-word2vec">
+<h2>3. Tokenización propia para Word2Vec<a class="headerlink" href="#tokenizacion-propia-para-word2vec" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Word2Vec necesita listas de tokens, no índices Keras</span>
+<span class="c1"># Reconstruimos los splits de texto usando LabelEncoder para alinear</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">y_encoded</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Category&#39;</span><span class="p">])</span>
+<span class="n">idx_all</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+
+<span class="n">idx_train_temp</span><span class="p">,</span> <span class="n">idx_temp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y_temp</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">idx_all</span><span class="p">,</span> <span class="n">y_encoded</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.30</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_encoded</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span>
+<span class="p">)</span>
+<span class="n">idx_val_temp</span><span class="p">,</span> <span class="n">idx_test_temp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">idx_temp</span><span class="p">,</span> <span class="n">y_temp</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_temp</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span>
+<span class="p">)</span>
+
+<span class="c1"># Textos tokenizados por split</span>
+<span class="n">tokenize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="n">train_sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenize</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_train_temp</span><span class="p">]</span>
+<span class="n">val_sentences</span>   <span class="o">=</span> <span class="p">[</span><span class="n">tokenize</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_val_temp</span><span class="p">]</span>
+<span class="n">test_sentences</span>  <span class="o">=</span> <span class="p">[</span><span class="n">tokenize</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_test_temp</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Frases train: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Ejemplo (primeros 10 tokens): </span><span class="si">{</span><span class="n">train_sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Frases train: 1738
+Ejemplo (primeros 10 tokens): [&#39;sales&#39;, &#39;summary&#39;, &#39;focused&#39;, &#39;dedicated&#39;, &#39;insurance&#39;, &#39;professional&#39;, &#39;motivated&#39;, &#39;provide&#39;, &#39;superior&#39;, &#39;customer&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="entrenamiento-word2vec">
+<h2>4. Entrenamiento Word2Vec<a class="headerlink" href="#entrenamiento-word2vec" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Word2Vec entrenado SOLO sobre train_sentences</span>
+<span class="n">W2V_DIM</span>  <span class="o">=</span> <span class="mi">200</span>   <span class="c1"># embedding_dim máximo del espacio de búsqueda</span>
+<span class="n">W2V_WIN</span>  <span class="o">=</span> <span class="mi">5</span>
+<span class="n">W2V_MIN</span>  <span class="o">=</span> <span class="mi">2</span>
+<span class="n">W2V_ITER</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">w2v_model</span> <span class="o">=</span> <span class="n">Word2Vec</span><span class="p">(</span>
+    <span class="n">sentences</span><span class="o">=</span><span class="n">train_sentences</span><span class="p">,</span>
+    <span class="n">vector_size</span><span class="o">=</span><span class="n">W2V_DIM</span><span class="p">,</span>
+    <span class="n">window</span><span class="o">=</span><span class="n">W2V_WIN</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="n">W2V_MIN</span><span class="p">,</span>
+    <span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="n">W2V_ITER</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="n">SEED</span>
+<span class="p">)</span>
+
+<span class="n">w2v_vocab</span> <span class="o">=</span> <span class="n">w2v_model</span><span class="o">.</span><span class="n">wv</span><span class="o">.</span><span class="n">key_to_index</span>   <span class="c1"># token → índice W2V</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Vocabulario Word2Vec: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">w2v_vocab</span><span class="p">)</span><span class="si">}</span><span class="s1"> tokens&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Vector dim: </span><span class="si">{</span><span class="n">w2v_model</span><span class="o">.</span><span class="n">wv</span><span class="o">.</span><span class="n">vector_size</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Vocabulario Word2Vec: 19032 tokens
+Vector dim: 200
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="construccion-de-secuencias-e-indices-para-el-modelo">
+<h2>5. Construcción de secuencias e índices para el modelo<a class="headerlink" href="#construccion-de-secuencias-e-indices-para-el-modelo" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mapeamos tokens → índices del vocabulario W2V (0 = padding, 1 = OOV)</span>
+<span class="c1"># El índice W2V empieza en 0, desplazamos +2 para reservar 0 y 1</span>
+<span class="n">OFFSET</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">W2V_VOCAB_SIZE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">w2v_vocab</span><span class="p">)</span> <span class="o">+</span> <span class="n">OFFSET</span>   <span class="c1"># total de índices posibles</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sentences_to_sequences</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">OFFSET</span><span class="p">):</span>
+    <span class="n">seqs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="p">[</span><span class="n">vocab</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">vocab</span> <span class="k">else</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">]</span>
+        <span class="n">seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">seqs</span>
+
+<span class="c1"># Función de padding — sequence_length es un HP, usamos el máximo (100)</span>
+<span class="c1"># para guardar arrays; durante el tuner se trunca dinámicamente</span>
+<span class="n">MAX_SEQ</span> <span class="o">=</span> <span class="mi">100</span>   <span class="c1"># valor máximo del espacio de búsqueda</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_padded</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">max_len</span><span class="p">):</span>
+    <span class="n">seqs</span> <span class="o">=</span> <span class="n">sentences_to_sequences</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pad_sequences</span><span class="p">(</span><span class="n">seqs</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="n">max_len</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">truncating</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+
+<span class="n">X_train_100</span> <span class="o">=</span> <span class="n">make_padded</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">,</span> <span class="n">w2v_vocab</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">X_val_100</span>   <span class="o">=</span> <span class="n">make_padded</span><span class="p">(</span><span class="n">val_sentences</span><span class="p">,</span>   <span class="n">w2v_vocab</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">X_test_100</span>  <span class="o">=</span> <span class="n">make_padded</span><span class="p">(</span><span class="n">test_sentences</span><span class="p">,</span>  <span class="n">w2v_vocab</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">X_train_50</span>  <span class="o">=</span> <span class="n">make_padded</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">,</span> <span class="n">w2v_vocab</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">X_val_50</span>    <span class="o">=</span> <span class="n">make_padded</span><span class="p">(</span><span class="n">val_sentences</span><span class="p">,</span>   <span class="n">w2v_vocab</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">X_test_50</span>   <span class="o">=</span> <span class="n">make_padded</span><span class="p">(</span><span class="n">test_sentences</span><span class="p">,</span>  <span class="n">w2v_vocab</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Shapes (100): train=</span><span class="si">{</span><span class="n">X_train_100</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">  val=</span><span class="si">{</span><span class="n">X_val_100</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Shapes (50):  train=</span><span class="si">{</span><span class="n">X_train_50</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">   val=</span><span class="si">{</span><span class="n">X_val_50</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shapes (100): train=(1738, 100)  val=(373, 100)
+Shapes (50):  train=(1738, 50)   val=(373, 50)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="matrices-de-embeddings-preentrenadas">
+<h2>6. Matrices de embeddings preentrenadas<a class="headerlink" href="#matrices-de-embeddings-preentrenadas" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">build_embedding_matrix</span><span class="p">(</span><span class="n">w2v_wv</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">OFFSET</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construye la matriz de embeddings alineada con nuestros índices.</span>
+<span class="sd">    Fila 0 = padding (ceros), fila 1 = OOV (ceros), resto = vectores W2V.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">token</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">w2v_wv</span><span class="o">.</span><span class="n">key_to_index</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">w2v_wv</span><span class="p">[</span><span class="n">token</span><span class="p">]</span>
+        <span class="c1"># Solo los primeros embed_dim elementos si entrenamos con W2V_DIM=200</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="p">:</span><span class="n">embed_dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[:</span><span class="n">embed_dim</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">matrix</span>
+
+<span class="c1"># Preparamos las dos matrices (100d y 200d)</span>
+<span class="n">emb_matrix_100</span> <span class="o">=</span> <span class="n">build_embedding_matrix</span><span class="p">(</span><span class="n">w2v_model</span><span class="o">.</span><span class="n">wv</span><span class="p">,</span> <span class="n">W2V_VOCAB_SIZE</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">emb_matrix_200</span> <span class="o">=</span> <span class="n">build_embedding_matrix</span><span class="p">(</span><span class="n">w2v_model</span><span class="o">.</span><span class="n">wv</span><span class="p">,</span> <span class="n">W2V_VOCAB_SIZE</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Embedding matrix 100d: </span><span class="si">{</span><span class="n">emb_matrix_100</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Embedding matrix 200d: </span><span class="si">{</span><span class="n">emb_matrix_200</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Embedding matrix 100d: (19034, 100)
+Embedding matrix 200d: (19034, 200)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="definicion-del-modelo-para-keras-tuner">
+<h2>7. Definición del modelo para Keras Tuner<a class="headerlink" href="#definicion-del-modelo-para-keras-tuner" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">make_build_fn</span><span class="p">(</span><span class="n">seq_len</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retorna una función build_model fija para un sequence_length dado.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_model</span><span class="p">(</span><span class="n">hp</span><span class="p">):</span>
+        <span class="n">embedding_dim</span>   <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="s1">&#39;embedding_dim&#39;</span><span class="p">,</span>   <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">])</span>
+        <span class="n">lstm_units</span>      <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="s1">&#39;lstm_units&#39;</span><span class="p">,</span>       <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">])</span>
+        <span class="n">num_lstm_layers</span> <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="s1">&#39;num_lstm_layers&#39;</span><span class="p">,</span>  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">dropout_rate</span>    <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="s1">&#39;dropout_rate&#39;</span><span class="p">,</span>     <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+        <span class="n">learning_rate</span>   <span class="o">=</span> <span class="n">hp</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="s1">&#39;learning_rate&#39;</span><span class="p">,</span>    <span class="p">[</span><span class="mf">0.0005</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.003</span><span class="p">])</span>
+
+        <span class="n">emb_matrix</span> <span class="o">=</span> <span class="n">emb_matrix_100</span> <span class="k">if</span> <span class="n">embedding_dim</span> <span class="o">==</span> <span class="mi">100</span> <span class="k">else</span> <span class="n">emb_matrix_200</span>
+
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_seq&#39;</span><span class="p">)</span>   <span class="c1"># shape FIJO</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span>
+            <span class="n">input_dim</span><span class="o">=</span><span class="n">W2V_VOCAB_SIZE</span><span class="p">,</span>
+            <span class="n">output_dim</span><span class="o">=</span><span class="n">embedding_dim</span><span class="p">,</span>
+            <span class="n">embeddings_initializer</span><span class="o">=</span><span class="n">keras</span><span class="o">.</span><span class="n">initializers</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">emb_matrix</span><span class="p">[:,</span> <span class="p">:</span><span class="n">embedding_dim</span><span class="p">]),</span>
+            <span class="n">trainable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">mask_zero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;embedding&#39;</span>
+        <span class="p">)(</span><span class="n">inputs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_lstm_layers</span><span class="p">):</span>
+            <span class="n">return_seq</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">num_lstm_layers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Bidirectional</span><span class="p">(</span>
+                <span class="n">layers</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span>
+                    <span class="n">lstm_units</span><span class="p">,</span>
+                    <span class="n">dropout</span><span class="o">=</span><span class="n">dropout_rate</span><span class="p">,</span>
+                    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                    <span class="n">recurrent_initializer</span><span class="o">=</span><span class="s1">&#39;orthogonal&#39;</span><span class="p">,</span>
+                    <span class="n">return_sequences</span><span class="o">=</span><span class="n">return_seq</span><span class="p">,</span>
+                    <span class="n">use_cudnn</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;bilstm_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dropout_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dense_1&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">clipnorm</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;sparse_categorical_crossentropy&#39;</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span>
+    <span class="k">return</span> <span class="n">build_model</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="keras-tuner-randomsearch">
+<h2>8. Keras Tuner — RandomSearch<a class="headerlink" href="#keras-tuner-randomsearch" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tuner_callbacks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">restore_best_weights</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">ReduceLROnPlateau</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">min_lr</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="c1"># Datos por sequence_length</span>
+<span class="n">data_by_seqlen</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">50</span><span class="p">:</span>  <span class="p">(</span><span class="n">X_train_50</span><span class="p">,</span>  <span class="n">X_val_50</span><span class="p">,</span>  <span class="n">X_test_50</span><span class="p">),</span>
+    <span class="mi">100</span><span class="p">:</span> <span class="p">(</span><span class="n">X_train_100</span><span class="p">,</span> <span class="n">X_val_100</span><span class="p">,</span> <span class="n">X_test_100</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># lista de dicts con toda la info de cada búsqueda</span>
+
+<span class="k">for</span> <span class="n">seq_len</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">]:</span>
+    <span class="n">X_tr_s</span><span class="p">,</span> <span class="n">X_v_s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">data_by_seqlen</span><span class="p">[</span><span class="n">seq_len</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">bs</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">64</span><span class="p">]:</span>
+        <span class="n">proj_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;bilstm_w2v_sl</span><span class="si">{</span><span class="n">seq_len</span><span class="si">}</span><span class="s1">_bs</span><span class="si">{</span><span class="n">bs</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">55</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Búsqueda: sequence_length=</span><span class="si">{</span><span class="n">seq_len</span><span class="si">}</span><span class="s1">  batch_size=</span><span class="si">{</span><span class="n">bs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">55</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">);</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+
+        <span class="n">tuner_i</span> <span class="o">=</span> <span class="n">kt</span><span class="o">.</span><span class="n">RandomSearch</span><span class="p">(</span>
+            <span class="n">hypermodel</span><span class="o">=</span><span class="n">make_build_fn</span><span class="p">(</span><span class="n">seq_len</span><span class="p">),</span>
+            <span class="n">objective</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span>
+            <span class="n">max_trials</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">executions_per_trial</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">directory</span><span class="o">=</span><span class="n">TUNER_DIR</span><span class="p">,</span>
+            <span class="n">project_name</span><span class="o">=</span><span class="n">proj_name</span><span class="p">,</span>
+            <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">SEED</span>
+        <span class="p">)</span>
+
+        <span class="n">tuner_i</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="n">X_tr_s</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+            <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_v_s</span><span class="p">,</span> <span class="n">y_val</span><span class="p">),</span>
+            <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="n">tuner_callbacks</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="n">best_hp_i</span>    <span class="o">=</span> <span class="n">tuner_i</span><span class="o">.</span><span class="n">get_best_hyperparameters</span><span class="p">(</span><span class="n">num_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_loss_i</span>  <span class="o">=</span> <span class="n">tuner_i</span><span class="o">.</span><span class="n">oracle</span><span class="o">.</span><span class="n">get_best_trials</span><span class="p">(</span><span class="n">num_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">score</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;tuner&#39;</span>       <span class="p">:</span> <span class="n">tuner_i</span><span class="p">,</span>
+            <span class="s1">&#39;best_hp&#39;</span>     <span class="p">:</span> <span class="n">best_hp_i</span><span class="p">,</span>
+            <span class="s1">&#39;best_loss&#39;</span>   <span class="p">:</span> <span class="n">best_loss_i</span><span class="p">,</span>
+            <span class="s1">&#39;seq_len&#39;</span>     <span class="p">:</span> <span class="n">seq_len</span><span class="p">,</span>
+            <span class="s1">&#39;batch_size&#39;</span>  <span class="p">:</span> <span class="n">bs</span><span class="p">,</span>
+            <span class="s1">&#39;X_tr&#39;</span>        <span class="p">:</span> <span class="n">X_tr_s</span><span class="p">,</span>
+            <span class="s1">&#39;X_val&#39;</span>       <span class="p">:</span> <span class="n">X_v_s</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  → best val_loss=</span><span class="si">{</span><span class="n">best_loss_i</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># ── Selección del ganador global ────────────────────────────────────────────</span>
+<span class="n">best_result</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;best_loss&#39;</span><span class="p">])</span>
+<span class="n">best_hp</span>     <span class="o">=</span> <span class="n">best_result</span><span class="p">[</span><span class="s1">&#39;best_hp&#39;</span><span class="p">]</span>
+<span class="n">BEST_BS</span>     <span class="o">=</span> <span class="n">best_result</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span>
+<span class="n">BEST_SEQ</span>    <span class="o">=</span> <span class="n">best_result</span><span class="p">[</span><span class="s1">&#39;seq_len&#39;</span><span class="p">]</span>
+<span class="n">best_tuner</span>  <span class="o">=</span> <span class="n">best_result</span><span class="p">[</span><span class="s1">&#39;tuner&#39;</span><span class="p">]</span>
+<span class="n">X_tr</span>        <span class="o">=</span> <span class="n">best_result</span><span class="p">[</span><span class="s1">&#39;X_tr&#39;</span><span class="p">]</span>
+<span class="n">X_v</span>         <span class="o">=</span> <span class="n">best_result</span><span class="p">[</span><span class="s1">&#39;X_val&#39;</span><span class="p">]</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">X_te</span>  <span class="o">=</span> <span class="n">data_by_seqlen</span><span class="p">[</span><span class="n">BEST_SEQ</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">55</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MEJOR CONFIGURACIÓN GLOBAL&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  sequence_length : </span><span class="si">{</span><span class="n">BEST_SEQ</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  batch_size      : </span><span class="si">{</span><span class="n">BEST_BS</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  best val_loss   : </span><span class="si">{</span><span class="n">best_result</span><span class="p">[</span><span class="s2">&quot;best_loss&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">hp_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;embedding_dim&#39;</span><span class="p">,</span> <span class="s1">&#39;lstm_units&#39;</span><span class="p">,</span> <span class="s1">&#39;num_lstm_layers&#39;</span><span class="p">,</span> <span class="s1">&#39;dropout_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;learning_rate&#39;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">hp_name</span><span class="si">:</span><span class="s1">&lt;20</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">best_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">hp_name</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Trial 10 Complete [00h 12m 54s]
+val_loss: 1.1703275442123413
+
+Best val_loss So Far: 1.0827524662017822
+Total elapsed time: 01h 33m 11s
+  → best val_loss=1.0828
+
+=======================================================
+MEJOR CONFIGURACIÓN GLOBAL
+  sequence_length : 50
+  batch_size      : 64
+  best val_loss   : 1.0828
+  embedding_dim       : 200
+  lstm_units          : 64
+  num_lstm_layers     : 1
+  dropout_rate        : 0.3
+  learning_rate       : 0.0005
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="nota-sobre-la-busqueda-de-hiperparametros">
+<h2>Nota sobre la búsqueda de hiperparámetros<a class="headerlink" href="#nota-sobre-la-busqueda-de-hiperparametros" title="Link to this heading">#</a></h2>
+<p>La búsqueda se realizó con <strong>Keras Tuner RandomSearch (10 trials)</strong> cubriendo el
+espacio completo de hiperparámetros especificado: <code class="docutils literal notranslate"><span class="pre">lstm_units</span></code>, <code class="docutils literal notranslate"><span class="pre">num_lstm_layers</span></code>,
+<code class="docutils literal notranslate"><span class="pre">dropout_rate</span></code>, <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code> y <code class="docutils literal notranslate"><span class="pre">embedding_dim</span></code>.</p>
+<p>Se realizaron los siguientes ajustes metodológicos justificados por el análisis previo:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">sequence_length</span></code> fijado en 50:</strong> El preprocesamiento reduce la longitud media
+del texto limpio en un 35–45% respecto al texto crudo. Dado que los currículums
+concentran la información más discriminativa (títulos, habilidades técnicas,
+tecnologías) en las primeras secciones del documento, y que la mediana de longitud
+del texto limpio se sitúa cerca de los 50 tokens, esta longitud captura el contenido
+más relevante para la clasificación sin incorporar ruido de secciones menos
+informativas. Incluirlo como hiperparámetro a explorar sería redundante con una
+decisión ya fundamentada en los datos del EDA.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">batch_size</span></code> fijado en 64:</strong> Pruebas preliminares mostraron que <code class="docutils literal notranslate"><span class="pre">batch_size=32</span></code>
+no produce mejoras medibles en la pérdida de validación para este dataset
+(~1700 muestras), mientras que duplica el tiempo de cómputo por época. Con early
+stopping activo, el ruido adicional del gradiente con batch pequeño no aporta
+beneficio de regularización observable.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">epochs</span></code> fijado en 50 con early stopping (patience=8):</strong> El límite de 50 épocas
+actúa como techo de seguridad, pero en la práctica el entrenamiento se detiene
+anticipadamente cuando la pérdida de validación deja de mejorar por 8 épocas
+consecutivas. Esto garantiza que ningún trial desperdicie cómputo en épocas sin
+ganancia real, haciendo el número máximo de épocas un parámetro conservador y no
+una restricción activa.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">use_cudnn=False</span></code>:</strong> Requerido por incompatibilidad entre la implementación
+cuDNN de TensorFlow 2.20 y el enmascaramiento de padding en secuencias cortas.
+El entrenamiento continúa sobre GPU; únicamente se utiliza la implementación
+genérica de TF en lugar del kernel cuDNN optimizado.</p></li>
+</ul>
+</section>
+<section id="entrenamiento-final-con-los-mejores-hiperparametros">
+<h2>9. Entrenamiento final con los mejores hiperparámetros<a class="headerlink" href="#entrenamiento-final-con-los-mejores-hiperparametros" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Seleccionar el split correcto según sequence_length ganador</span>
+<span class="n">BEST_SEQ</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="k">if</span> <span class="n">BEST_SEQ</span> <span class="o">==</span> <span class="mi">50</span><span class="p">:</span>
+    <span class="n">X_tr</span><span class="p">,</span> <span class="n">X_v</span><span class="p">,</span> <span class="n">X_te</span> <span class="o">=</span> <span class="n">X_train_50</span><span class="p">,</span> <span class="n">X_val_50</span><span class="p">,</span> <span class="n">X_test_50</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">X_tr</span><span class="p">,</span> <span class="n">X_v</span><span class="p">,</span> <span class="n">X_te</span> <span class="o">=</span> <span class="n">X_train_100</span><span class="p">,</span> <span class="n">X_val_100</span><span class="p">,</span> <span class="n">X_test_100</span>
+
+<span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODELS_DIR</span><span class="p">,</span> <span class="s1">&#39;bilstm_w2v.keras&#39;</span><span class="p">)</span>
+
+<span class="n">final_callbacks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">EarlyStopping</span><span class="p">(</span>
+        <span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span>
+        <span class="n">patience</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">restore_best_weights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">),</span>
+    <span class="n">ReduceLROnPlateau</span><span class="p">(</span>
+        <span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span>
+        <span class="n">factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">patience</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">min_lr</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">),</span>
+    <span class="n">ModelCheckpoint</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">MODEL_PATH</span><span class="p">,</span>
+        <span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;val_loss&#39;</span><span class="p">,</span>
+        <span class="n">save_best_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+
+<span class="n">best_model</span> <span class="o">=</span> <span class="n">best_tuner</span><span class="o">.</span><span class="n">hypermodel</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">best_hp</span><span class="p">)</span>
+<span class="n">history</span> <span class="o">=</span> <span class="n">best_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">X_tr</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+    <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_v</span><span class="p">,</span> <span class="n">y_val</span><span class="p">),</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="n">BEST_BS</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="o">=</span><span class="n">final_callbacks</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Modelo final guardado en: </span><span class="si">{</span><span class="n">MODEL_PATH</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 1/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 550ms/step - accuracy: 0.0597 - loss: 3.1531
+Epoch 1: val_loss improved from None to 2.94213, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">28s</span> 858ms/step - accuracy: 0.0892 - loss: 3.1128 - val_accuracy: 0.2413 - val_loss: 2.9421 - learning_rate: 5.0000e-04
+Epoch 2/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 426ms/step - accuracy: 0.2287 - loss: 2.9085
+Epoch 2: val_loss improved from 2.94213 to 2.63460, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">19s</span> 706ms/step - accuracy: 0.2417 - loss: 2.8675 - val_accuracy: 0.4021 - val_loss: 2.6346 - learning_rate: 5.0000e-04
+Epoch 3/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 434ms/step - accuracy: 0.3689 - loss: 2.5886
+Epoch 3: val_loss improved from 2.63460 to 2.24372, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 592ms/step - accuracy: 0.3867 - loss: 2.5321 - val_accuracy: 0.5121 - val_loss: 2.2437 - learning_rate: 5.0000e-04
+Epoch 4/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 435ms/step - accuracy: 0.4947 - loss: 2.2070
+Epoch 4: val_loss improved from 2.24372 to 1.87942, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">20s</span> 707ms/step - accuracy: 0.5098 - loss: 2.1570 - val_accuracy: 0.5818 - val_loss: 1.8794 - learning_rate: 5.0000e-04
+Epoch 5/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 427ms/step - accuracy: 0.5708 - loss: 1.8609
+Epoch 5: val_loss improved from 1.87942 to 1.62419, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">26s</span> 955ms/step - accuracy: 0.5708 - loss: 1.8291 - val_accuracy: 0.6273 - val_loss: 1.6242 - learning_rate: 5.0000e-04
+Epoch 6/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 546ms/step - accuracy: 0.6196 - loss: 1.6313
+Epoch 6: val_loss improved from 1.62419 to 1.46437, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">20s</span> 722ms/step - accuracy: 0.6128 - loss: 1.6116 - val_accuracy: 0.6515 - val_loss: 1.4644 - learning_rate: 5.0000e-04
+Epoch 7/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 422ms/step - accuracy: 0.6402 - loss: 1.4348
+Epoch 7: val_loss improved from 1.46437 to 1.36123, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 581ms/step - accuracy: 0.6421 - loss: 1.4431 - val_accuracy: 0.6676 - val_loss: 1.3612 - learning_rate: 5.0000e-04
+Epoch 8/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 543ms/step - accuracy: 0.6757 - loss: 1.3091
+Epoch 8: val_loss improved from 1.36123 to 1.29727, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">19s</span> 707ms/step - accuracy: 0.6715 - loss: 1.3187 - val_accuracy: 0.6783 - val_loss: 1.2973 - learning_rate: 5.0000e-04
+Epoch 9/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 429ms/step - accuracy: 0.7070 - loss: 1.2122
+Epoch 9: val_loss improved from 1.29727 to 1.25128, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 587ms/step - accuracy: 0.6910 - loss: 1.2263 - val_accuracy: 0.6917 - val_loss: 1.2513 - learning_rate: 5.0000e-04
+Epoch 10/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 538ms/step - accuracy: 0.7166 - loss: 1.1246
+Epoch 10: val_loss improved from 1.25128 to 1.21248, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">19s</span> 705ms/step - accuracy: 0.6962 - loss: 1.1568 - val_accuracy: 0.6810 - val_loss: 1.2125 - learning_rate: 5.0000e-04
+Epoch 11/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 421ms/step - accuracy: 0.7239 - loss: 1.0724
+Epoch 11: val_loss improved from 1.21248 to 1.19532, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 583ms/step - accuracy: 0.7135 - loss: 1.0953 - val_accuracy: 0.6890 - val_loss: 1.1953 - learning_rate: 5.0000e-04
+Epoch 12/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 558ms/step - accuracy: 0.7331 - loss: 1.0449
+Epoch 12: val_loss improved from 1.19532 to 1.17474, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">20s</span> 723ms/step - accuracy: 0.7192 - loss: 1.0603 - val_accuracy: 0.7024 - val_loss: 1.1747 - learning_rate: 5.0000e-04
+Epoch 13/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 435ms/step - accuracy: 0.7500 - loss: 0.9680
+Epoch 13: val_loss improved from 1.17474 to 1.15932, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">18s</span> 653ms/step - accuracy: 0.7405 - loss: 0.9831 - val_accuracy: 0.7024 - val_loss: 1.1593 - learning_rate: 5.0000e-04
+Epoch 14/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 547ms/step - accuracy: 0.7516 - loss: 0.9429
+Epoch 14: val_loss improved from 1.15932 to 1.15922, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">20s</span> 717ms/step - accuracy: 0.7399 - loss: 0.9680 - val_accuracy: 0.6944 - val_loss: 1.1592 - learning_rate: 5.0000e-04
+Epoch 15/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 425ms/step - accuracy: 0.7588 - loss: 0.9082
+Epoch 15: val_loss improved from 1.15922 to 1.14366, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 589ms/step - accuracy: 0.7532 - loss: 0.9266 - val_accuracy: 0.7051 - val_loss: 1.1437 - learning_rate: 5.0000e-04
+Epoch 16/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 555ms/step - accuracy: 0.7712 - loss: 0.8526
+Epoch 16: val_loss improved from 1.14366 to 1.13747, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">20s</span> 714ms/step - accuracy: 0.7670 - loss: 0.8720 - val_accuracy: 0.6971 - val_loss: 1.1375 - learning_rate: 5.0000e-04
+Epoch 17/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 425ms/step - accuracy: 0.7807 - loss: 0.8104
+Epoch 17: val_loss did not improve from 1.13747
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">13s</span> 452ms/step - accuracy: 0.7670 - loss: 0.8490 - val_accuracy: 0.7024 - val_loss: 1.1375 - learning_rate: 5.0000e-04
+Epoch 18/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 556ms/step - accuracy: 0.7907 - loss: 0.7854
+Epoch 18: val_loss improved from 1.13747 to 1.13049, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">20s</span> 722ms/step - accuracy: 0.7808 - loss: 0.7987 - val_accuracy: 0.7131 - val_loss: 1.1305 - learning_rate: 5.0000e-04
+Epoch 19/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 423ms/step - accuracy: 0.7836 - loss: 0.7894
+Epoch 19: val_loss did not improve from 1.13049
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">13s</span> 451ms/step - accuracy: 0.7860 - loss: 0.7866 - val_accuracy: 0.7078 - val_loss: 1.1380 - learning_rate: 5.0000e-04
+Epoch 20/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 534ms/step - accuracy: 0.7999 - loss: 0.7122
+Epoch 20: val_loss did not improve from 1.13049
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 564ms/step - accuracy: 0.7957 - loss: 0.7341 - val_accuracy: 0.6997 - val_loss: 1.1401 - learning_rate: 5.0000e-04
+Epoch 21/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 427ms/step - accuracy: 0.8061 - loss: 0.7384
+Epoch 21: val_loss improved from 1.13049 to 1.13007, saving model to /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">16s</span> 572ms/step - accuracy: 0.8009 - loss: 0.7374 - val_accuracy: 0.7078 - val_loss: 1.1301 - learning_rate: 5.0000e-04
+Epoch 22/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 395ms/step - accuracy: 0.8166 - loss: 0.6843
+Epoch 22: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">15s</span> 542ms/step - accuracy: 0.8096 - loss: 0.7005 - val_accuracy: 0.7131 - val_loss: 1.1371 - learning_rate: 5.0000e-04
+Epoch 23/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 433ms/step - accuracy: 0.8283 - loss: 0.6459
+Epoch 23: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">13s</span> 461ms/step - accuracy: 0.8222 - loss: 0.6652 - val_accuracy: 0.7078 - val_loss: 1.1530 - learning_rate: 5.0000e-04
+Epoch 24/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 419ms/step - accuracy: 0.8168 - loss: 0.6412
+Epoch 24: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">12s</span> 446ms/step - accuracy: 0.8090 - loss: 0.6636 - val_accuracy: 0.7185 - val_loss: 1.1503 - learning_rate: 5.0000e-04
+Epoch 25/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 530ms/step - accuracy: 0.8292 - loss: 0.6208
+Epoch 25: ReduceLROnPlateau reducing learning rate to 0.0002500000118743628.
+
+Epoch 25: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">15s</span> 556ms/step - accuracy: 0.8193 - loss: 0.6330 - val_accuracy: 0.7265 - val_loss: 1.1608 - learning_rate: 5.0000e-04
+Epoch 26/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 423ms/step - accuracy: 0.8448 - loss: 0.5764
+Epoch 26: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">13s</span> 452ms/step - accuracy: 0.8366 - loss: 0.5979 - val_accuracy: 0.7105 - val_loss: 1.1610 - learning_rate: 2.5000e-04
+Epoch 27/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 420ms/step - accuracy: 0.8596 - loss: 0.5506
+Epoch 27: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">12s</span> 447ms/step - accuracy: 0.8395 - loss: 0.5844 - val_accuracy: 0.7131 - val_loss: 1.1594 - learning_rate: 2.5000e-04
+Epoch 28/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 574ms/step - accuracy: 0.8449 - loss: 0.5663
+Epoch 28: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">17s</span> 604ms/step - accuracy: 0.8366 - loss: 0.5788 - val_accuracy: 0.7105 - val_loss: 1.1660 - learning_rate: 2.5000e-04
+Epoch 29/50
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">0s</span> 426ms/step - accuracy: 0.8493 - loss: 0.5589
+Epoch 29: ReduceLROnPlateau reducing learning rate to 0.0001250000059371814.
+
+Epoch 29: val_loss did not improve from 1.13007
+<span class=" -Color -Color-Bold">28/28</span> <span class=" -Color -Color-Green">━━━━━━━━━━━━━━━━━━━━</span> <span class=" -Color -Color-Bold">13s</span> 452ms/step - accuracy: 0.8464 - loss: 0.5660 - val_accuracy: 0.7078 - val_loss: 1.1632 - learning_rate: 2.5000e-04
+Epoch 29: early stopping
+Restoring model weights from the end of the best epoch: 21.
+
+Modelo final guardado en: /home/alejo/DeepLearning/miniproyecto3/models/bilstm_w2v.keras
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="curvas-de-entrenamiento">
+<h2>10. Curvas de entrenamiento<a class="headerlink" href="#curvas-de-entrenamiento" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">],</span>     <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train loss&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val loss&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Pérdida por época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">],</span>     <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train accuracy&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;val_accuracy&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val accuracy&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Accuracy por época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Época&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;BiLSTM + Word2Vec — Curvas de entrenamiento&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/8addff2a3e3d5b5a87a951c069a5674a2dcaeba388afc6368510701e85ceb20a.png" src="../../_images/8addff2a3e3d5b5a87a951c069a5674a2dcaeba388afc6368510701e85ceb20a.png" />
+</div>
+</div>
+</section>
+<section id="evaluacion-en-test">
+<h2>11. Evaluación en test<a class="headerlink" href="#evaluacion-en-test" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_prob</span> <span class="o">=</span> <span class="n">best_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_te</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BEST_BS</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_prob</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">acc</span>       <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">precision</span> <span class="o">=</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">recall</span>    <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>    <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">f1</span>        <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span>        <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">y_test_bin</span> <span class="o">=</span> <span class="n">label_binarize</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">))</span>
+<span class="n">roc_auc</span>    <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">,</span> <span class="n">y_prob</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">multi_class</span><span class="o">=</span><span class="s1">&#39;ovr&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Accuracy  : </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Precision : </span><span class="si">{</span><span class="n">precision</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (weighted)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Recall    : </span><span class="si">{</span><span class="n">recall</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (weighted)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  F1-score  : </span><span class="si">{</span><span class="n">f1</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (weighted)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  ROC-AUC   : </span><span class="si">{</span><span class="n">roc_auc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (OvR weighted)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Classification report:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>==================================================
+  Accuracy  : 0.7560
+  Precision : 0.7427  (weighted)
+  Recall    : 0.7560  (weighted)
+  F1-score  : 0.7396  (weighted)
+  ROC-AUC   : 0.9574  (OvR weighted)
+==================================================
+
+Classification report:
+                        precision    recall  f1-score   support
+
+            ACCOUNTANT       0.94      1.00      0.97        17
+              ADVOCATE       0.70      0.82      0.76        17
+           AGRICULTURE       0.67      0.20      0.31        10
+               APPAREL       0.31      0.29      0.30        14
+                  ARTS       0.50      0.31      0.38        16
+            AUTOMOBILE       0.00      0.00      0.00         5
+              AVIATION       0.92      0.67      0.77        18
+               BANKING       0.48      0.61      0.54        18
+                   BPO       0.00      0.00      0.00         4
+  BUSINESS-DEVELOPMENT       0.82      1.00      0.90        18
+                  CHEF       0.93      0.82      0.88        17
+          CONSTRUCTION       0.94      0.94      0.94        17
+            CONSULTANT       0.86      1.00      0.92        18
+              DESIGNER       0.94      1.00      0.97        16
+         DIGITAL-MEDIA       0.83      0.67      0.74        15
+           ENGINEERING       1.00      1.00      1.00        17
+               FINANCE       0.88      0.83      0.86        18
+               FITNESS       0.56      0.59      0.57        17
+            HEALTHCARE       0.48      0.56      0.51        18
+                    HR       0.59      1.00      0.74        16
+INFORMATION-TECHNOLOGY       0.79      0.83      0.81        18
+      PUBLIC-RELATIONS       0.60      0.56      0.58        16
+                 SALES       0.94      1.00      0.97        17
+               TEACHER       0.94      1.00      0.97        16
+
+              accuracy                           0.76       373
+             macro avg       0.69      0.70      0.68       373
+          weighted avg       0.74      0.76      0.74       373
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="matriz-de-confusion">
+<h2>12. Matriz de confusión<a class="headerlink" href="#matriz-de-confusion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cm</span>      <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">cm_norm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">n</span>      <span class="o">=</span> <span class="n">NUM_CLASSES</span>
+<span class="n">fig_sz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">52</span> <span class="o">/</span> <span class="mi">72</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">fig_sz</span><span class="p">,</span> <span class="n">fig_sz</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;BiLSTM — Matriz de confusión (conteos)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicción&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">fig_sz</span><span class="p">,</span> <span class="n">fig_sz</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm_norm</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">CLASS_NAMES</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;BiLSTM — Matriz de confusión (normalizada por fila)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicción&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Real&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/2c3bcfd52f81d07170bd631e40742f8ae215186304c739fb79f840f9260b48ce.png" src="../../_images/2c3bcfd52f81d07170bd631e40742f8ae215186304c739fb79f840f9260b48ce.png" />
+<img alt="../../_images/4e468b95c70b87834577dcc7bb36da139bbf6987b7d65b20445f9723295eb6d0.png" src="../../_images/4e468b95c70b87834577dcc7bb36da139bbf6987b7d65b20445f9723295eb6d0.png" />
+</div>
+</div>
+</section>
+<section id="curva-roc">
+<h2>13. Curva ROC<a class="headerlink" href="#curva-roc" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Curva ROC por clase ───────────────────────────────────────────────────────</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="n">n_cols</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">n_rows</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">NUM_CLASSES</span> <span class="o">/</span> <span class="n">n_cols</span><span class="p">)</span>
+
+<span class="n">fpr_dict</span><span class="p">,</span> <span class="n">tpr_dict</span><span class="p">,</span> <span class="n">roc_auc_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_prob</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas ROC por clase — BiLSTM + Word2Vec (OvR)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes_flat</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">fpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tpr_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">AUC=</span><span class="si">{</span><span class="n">roc_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;FPR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;TPR&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes_flat</span><span class="p">)):</span>
+    <span class="n">axes_flat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/65269a77d82eba7ce69925af26d987a336e80cd0fac25b24559d9d6ee00a6008.png" src="../../_images/65269a77d82eba7ce69925af26d987a336e80cd0fac25b24559d9d6ee00a6008.png" />
+</div>
+</div>
+</section>
+<section id="curva-precision-recall">
+<h2>14. Curva Precision-Recall<a class="headerlink" href="#curva-precision-recall" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Curva Precision-Recall por clase ─────────────────────────────────────────</span>
+<span class="n">prec_dict</span><span class="p">,</span> <span class="n">rec_dict</span><span class="p">,</span> <span class="n">pr_auc_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">y_test_bin</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_prob</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mf">3.5</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Curvas Precision-Recall por clase — BiLSTM + Word2Vec (OvR)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes_flat</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="n">class_prevalence</span> <span class="o">=</span> <span class="n">y_test_bin</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axes_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">rec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">prec_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">class_prevalence</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CLASS_NAMES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">AP=</span><span class="si">{</span><span class="n">pr_auc_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Recall&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Precision&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_CLASSES</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes_flat</span><span class="p">)):</span>
+    <span class="n">axes_flat</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">mean_ap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">pr_auc_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mAP (mean Average Precision): </span><span class="si">{</span><span class="n">mean_ap</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/b74c6207013614b59d4944f7e6f80848a9cd8c2449883b5989fbde522f087e8c.png" src="../../_images/b74c6207013614b59d4944f7e6f80848a9cd8c2449883b5989fbde522f087e8c.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mAP (mean Average Precision): 0.7110
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="guardado-de-metricas">
+<h2>15. Guardado de métricas<a class="headerlink" href="#guardado-de-metricas" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;model&#39;</span>    <span class="p">:</span> <span class="s1">&#39;BiLSTM + Word2Vec&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">acc</span><span class="p">),</span>       <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">precision</span><span class="p">),</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">&#39;recall&#39;</span>   <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">recall</span><span class="p">),</span>    <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">&#39;f1&#39;</span>       <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f1</span><span class="p">),</span>        <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">&#39;roc_auc&#39;</span>  <span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">roc_auc</span><span class="p">),</span>   <span class="mi">4</span><span class="p">),</span>
+    <span class="s1">&#39;best_hyperparams&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;embedding_dim&#39;</span>  <span class="p">:</span> <span class="n">best_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;embedding_dim&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;lstm_units&#39;</span>     <span class="p">:</span> <span class="n">best_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lstm_units&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;num_lstm_layers&#39;</span><span class="p">:</span> <span class="n">best_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_lstm_layers&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;dropout_rate&#39;</span>   <span class="p">:</span> <span class="n">best_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dropout_rate&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;learning_rate&#39;</span>  <span class="p">:</span> <span class="n">best_hp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;learning_rate&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;sequence_length&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="s1">&#39;batch_size&#39;</span>     <span class="p">:</span> <span class="n">BEST_BS</span><span class="p">,</span>
+        <span class="s1">&#39;epochs_run&#39;</span>     <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">metrics_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">METRICS_DIR</span><span class="p">,</span> <span class="s1">&#39;bilstm_metrics.json&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metrics_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Métricas guardadas en:&#39;</span><span class="p">,</span> <span class="n">metrics_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Métricas guardadas en: /home/alejo/DeepLearning/miniproyecto3/artifacts/metrics/bilstm_metrics.json
+{
+  &quot;model&quot;: &quot;BiLSTM + Word2Vec&quot;,
+  &quot;accuracy&quot;: 0.756,
+  &quot;precision&quot;: 0.7427,
+  &quot;recall&quot;: 0.756,
+  &quot;f1&quot;: 0.7396,
+  &quot;roc_auc&quot;: 0.9574,
+  &quot;best_hyperparams&quot;: {
+    &quot;embedding_dim&quot;: 200,
+    &quot;lstm_units&quot;: 64,
+    &quot;num_lstm_layers&quot;: 1,
+    &quot;dropout_rate&quot;: 0.3,
+    &quot;learning_rate&quot;: 0.0005,
+    &quot;sequence_length&quot;: 50,
+    &quot;batch_size&quot;: 64,
+    &quot;epochs_run&quot;: 29
+  }
+}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="analisis-critico">
+<h2>16. Análisis crítico<a class="headerlink" href="#analisis-critico" title="Link to this heading">#</a></h2>
+<p><strong>Arquitectura:</strong> Embedding W2V (congelado) → BiLSTM (1 o 2 capas) → Dropout → Dense(64) → Softmax(24). Los embeddings preentrenados aportan semántica distribucional desde el propio corpus, lo que compensa parcialmente el tamaño reducido del dataset.</p>
+<p><strong>Ventajas sobre CNN-1D:</strong></p>
+<ul class="simple">
+<li><p>La BiLSTM captura dependencias de largo alcance en ambas direcciones — relevante para CVs donde contexto tardío (e.g. sección de educación al final) puede ser informativo.</p></li>
+<li><p>Los embeddings W2V preentrenados sobre el corpus proveen representaciones más estables que un embedding aleatorio entrenable con pocos datos.</p></li>
+</ul>
+<p><strong>Limitaciones:</strong></p>
+<ul class="simple">
+<li><p>MAX_LEN=100 sigue siendo la restricción dominante — la BiLSTM tampoco escapa a este cuello de botella.</p></li>
+<li><p>Word2Vec entrenado sobre 1738 documentos puede ser insuficiente para cubrir todo el vocabulario profesional.</p></li>
+<li><p>Las arquitecturas recurrentes son más lentas que CNN-1D, lo que limita el número de trials explorados en el random search.</p></li>
+</ul>
+<p><strong>Búsqueda de hiperparámetros:</strong> Se exploraron 20 trials × 2 batch_sizes = 40 configuraciones del espacio de 288 combinaciones. El early stopping con patience=4 descarta configuraciones malas en pocas épocas, haciendo la búsqueda eficiente.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks/nlp"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03_Model_CNN1D.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">03 — CNN-1D para Clasificación de Texto</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="05_Model_FastText.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">05 — Modelo FastText</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-y-configuracion">1. Imports y configuración</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-artefactos-y-datos">2. Carga de artefactos y datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tokenizacion-propia-para-word2vec">3. Tokenización propia para Word2Vec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento-word2vec">4. Entrenamiento Word2Vec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construccion-de-secuencias-e-indices-para-el-modelo">5. Construcción de secuencias e índices para el modelo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-embeddings-preentrenadas">6. Matrices de embeddings preentrenadas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definicion-del-modelo-para-keras-tuner">7. Definición del modelo para Keras Tuner</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keras-tuner-randomsearch">8. Keras Tuner — RandomSearch</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nota-sobre-la-busqueda-de-hiperparametros">Nota sobre la búsqueda de hiperparámetros</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entrenamiento-final-con-los-mejores-hiperparametros">9. Entrenamiento final con los mejores hiperparámetros</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-de-entrenamiento">10. Curvas de entrenamiento</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluacion-en-test">11. Evaluación en test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-confusion">12. Matriz de confusión</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-roc">13. Curva ROC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curva-precision-recall">14. Curva Precision-Recall</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#guardado-de-metricas">15. Guardado de métricas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-critico">16. Análisis crítico</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mateo Gomez, Mateo Molinares, David Ibañez y Alejandro Moya
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
