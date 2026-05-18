@@ -1,0 +1,27 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Dependencias del sistema necesarias para OpenCV y scipy
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements_image.txt .
+
+# PyTorch primero (índice separado por el wheel de CUDA)
+RUN pip install --no-cache-dir torch==2.10.0 \
+    --index-url https://download.pytorch.org/whl/cu128
+
+# Resto de dependencias
+RUN pip install --no-cache-dir -r requirements_image.txt
+
+COPY app/image_app/      ./app/image_app/
+COPY app/sartorius_utils.py ./app/sartorius_utils.py
+COPY models/unetpp_best.pth ./models/unetpp_best.pth
+
+EXPOSE 8001
+
+CMD ["uvicorn", "app.image_app.main_image:app", "--host", "0.0.0.0", "--port", "8001"]

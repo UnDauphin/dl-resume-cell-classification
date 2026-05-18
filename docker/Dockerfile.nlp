@@ -1,0 +1,19 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN python -m nltk.downloader stopwords
+
+COPY app/main.py        ./app/main.py
+COPY app/predictor.py   ./app/predictor.py
+COPY app/schemas.py     ./app/schemas.py
+COPY models/tfidf_xgboost.json          ./models/tfidf_xgboost.json
+COPY models/tfidf_xgboost_tfidf.pkl     ./models/tfidf_xgboost_tfidf.pkl
+COPY artifacts/label_encoder.pkl        ./artifacts/label_encoder.pkl
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

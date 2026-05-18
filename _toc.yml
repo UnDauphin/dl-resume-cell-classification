@@ -1,0 +1,21 @@
+format: jb-book
+root: intro
+parts:
+  - caption: "Bloque 1 — Segmentación de Imágenes"
+    chapters:
+    - file: notebooks/vision/01_EDA
+    - file: notebooks/vision/02_preprocesamiento_sartorius
+    - file: notebooks/vision/03_modelado_sartorius_cellpose
+    - file: notebooks/vision/04_modelado_sartorius_OPTIMIZADO
+    - file: notebooks/vision/05_hover-net
+    - file: notebooks/vision/06_mask_rcnn
+    - file: notebooks/vision/07_evaluacion_final
+  - caption: "Bloque 2 — NLP"
+    chapters:
+    - file: notebooks/01_EDA_NLP_Resume
+    - file: notebooks/02_Model_TFIDF_XGBoost
+    - file: notebooks/03_Model_CNN1D
+    - file: notebooks/04_Model_BiLSTM
+    - file: notebooks/05_Model_FastText
+    - file: notebooks/06_Model_DistilBERT
+    - file: notebooks/07_Comparacion_Modelos

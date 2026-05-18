@@ -1,0 +1,19 @@
+# requirements_image.txt
+# API de segmentación de imágenes — entorno torch_img (Python 3.10)
+#
+# Instalar PyTorch primero (aparte, con index-url):
+#   pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+#
+# Luego el resto:
+#   pip install -r requirements_image.txt
+
+segmentation-models-pytorch==0.5.0
+timm==1.0.27
+fastapi==0.136.1
+uvicorn[standard]==0.47.0
+python-multipart
+opencv-python-headless
+numpy
+scipy
+scikit-image
+pydantic==2.13.4
