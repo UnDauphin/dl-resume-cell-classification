@@ -12,10 +12,10 @@ parts:
     - file: notebooks/vision/07_evaluacion_final
   - caption: "Bloque 2 — NLP"
     chapters:
-    - file: notebooks/01_EDA_NLP_Resume
-    - file: notebooks/02_Model_TFIDF_XGBoost
-    - file: notebooks/03_Model_CNN1D
-    - file: notebooks/04_Model_BiLSTM
-    - file: notebooks/05_Model_FastText
-    - file: notebooks/06_Model_DistilBERT
-    - file: notebooks/07_Comparacion_Modelos
+    - file: notebooks/nlp/01_EDA_NLP_Resume
+    - file: notebooks/nlp/02_Model_TFIDF_XGBoost
+    - file: notebooks/nlp/03_Model_CNN1D
+    - file: notebooks/nlp/04_Model_BiLSTM
+    - file: notebooks/nlp/05_Model_FastText
+    - file: notebooks/nlp/06_Model_DistilBERT
+    - file: notebooks/nlp/07_Comparacion_Modelos

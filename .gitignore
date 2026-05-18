@@ -1,0 +1,17 @@
+# Build
+_build/
+
+# Datos y modelos pesados
+models/
+artifacts/
+tuner_bilstm/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Archivos temporales
+*.log
+*.tmp
